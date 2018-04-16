@@ -19,7 +19,7 @@
 #include "graphics.h"
 
 constexpr int windowSize = 600;
-constexpr int maximumSpeed = 100000;
+constexpr int maximumSpeed = 2;
 
 window _window(windowSize, windowSize);
 
@@ -118,13 +118,13 @@ void InitializeObjects(size_t size) {
         p.z /= 500.0;
         a.setCoor(p);
         a.prevPoint = p;
-        a.v.x = rand() % maximumSpeed;
+        a.v.x = rand() % maximumSpeed + 1;
         if (rand() % 2)
             a.v.x *= -1;
-        a.v.y = rand() % maximumSpeed;
+        a.v.y = rand() % maximumSpeed + 1;
         if (rand() % 2)
             a.v.y *= -1;
-        a.v.z = rand() % maximumSpeed;
+        a.v.z = rand() % maximumSpeed + 1;
         if (rand() % 2)
             a.v.z *= -1;
         atoms.push_back(a);
@@ -136,8 +136,8 @@ void startThread() {
 }
 
 int main(int argc, char *argv[]) {
-    srand(3);
-    InitializeObjects(100000); //Создаем объекты
+    srand(4);
+    InitializeObjects(10000); //Создаем объекты
     _window.width = 600;
     _window.height = 600;
     InitGlut(argc, argv);

@@ -71,8 +71,9 @@ void Render::draw() { //Рисовать все, что нужно
     for (auto& pln : *planes) { //Рисуем стенки
         drawPlane(pln);
     }
-    for (auto& atm : *atoms) { //Рисуем молекулы
-        drawPoint(atm);
+    for (int i = 0; i < std::min(int((*atoms).size()), 1000); ++i) { //Рисуем молекулы
+        if (checkInVessel((*planes)[0], (*planes)[1], (*planes)[2], (*planes)[3], (*atoms)[i].point)) //Только если молекула внутри сосуда
+            drawPoint((*atoms)[i]);
     }
     //Пишем давление
     std::string pres = "Pressure: ";
