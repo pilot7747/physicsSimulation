@@ -18,13 +18,13 @@
 #include "borders.h"
 
 
-struct window {
+struct window { //Класс "окно"
     int width, height;
     window(int a, int b) : width(a), height(b) {}
     window() {}
 };
 
-void printtext(int x, int y, std::string String)
+void printtext(int x, int y, std::string String) //Написать текст в GLUT
 {
     //(x,y) is from the bottom left of the window
     glMatrixMode(GL_PROJECTION);
@@ -48,32 +48,33 @@ void printtext(int x, int y, std::string String)
     glPopMatrix();
 }
 
-class Render {
+class Render { //Рендер
 private:
     window w;
-    void drawPoint(const atom &a);
-    double coordZ(const d_8& z);
-    double coordX(const d_8& x);
-    void drawPlane(const border& b);
-    std::vector<atom>* atoms;
-    std::vector<border>* planes;
+    void drawPoint(const atom &a); //Нарисовать молекулу
+    double coordZ(const d_8& z); //Перевести из адекватных координат в GLUT'овские
+    double coordX(const d_8& x); //Перевести из адекватных координат в GLUT'овские
+    void drawPlane(const border& b); //Нарисовать прямоугольник
+    std::vector<atom>* atoms; //Указатель на массив атомов
+    std::vector<border>* planes; //Указатель на массив стенок
 public:
-    long double pressure;
+    long double pressure; //Давление
     Render() {}
     Render(std::vector<atom>* _atoms, std::vector<border>* _planes, window _window) : atoms(_atoms), planes(_planes), w(_window) {}
     void draw();
 };
 
-void Render::draw() {
-    glClear(GL_COLOR_BUFFER_BIT);
+void Render::draw() { //Рисовать все, что нужно
+    glClear(GL_COLOR_BUFFER_BIT); //Очистка буффера
     glLoadIdentity();
     glColor4d(0.5, 0.0, 0.5, 1.0);
-    for (auto& pln : *planes) {
+    for (auto& pln : *planes) { //Рисуем стенки
         drawPlane(pln);
     }
-    for (auto& atm : *atoms) {
+    for (auto& atm : *atoms) { //Рисуем молекулы
         drawPoint(atm);
     }
+    //Пишем давление
     std::string pres = "Pressure: ";
     std::ostringstream outs;
     outs.width(10);
@@ -81,7 +82,8 @@ void Render::draw() {
     outs << pressure;
     pres += outs.str();
     printtext(10, 10, pres);
-    glutSwapBuffers();
+    
+    glutSwapBuffers(); //Обновляем буффер
     glutPostRedisplay();
 }
 
@@ -101,11 +103,6 @@ void Render::drawPlane(const border& b) {
 }
 
 void Render::drawPoint(const atom &a) {
-   /* glBegin(GL_POLYGON);
-    for (d_8 i = 0; i < 2 * 3.14159; i += 3.14159 / 2.0)
-        glVertex3d(cos(i) * 0.01 + (double)(a.x()), sin(i) * 0.01 + double(a.z()), 0);
-    glEnd();
-    */
     glPointSize(1.0f);
     glBegin(GL_POINTS);
         glColor3f(0.0, 1, 0.0);

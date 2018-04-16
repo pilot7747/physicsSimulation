@@ -12,16 +12,16 @@
 #include <GLUT/GLUT.h>
 #include <OpenGL/OpenGL.h>
 
-constexpr long double dt = 0.01;
-constexpr int dt_int = dt * 1000;
+constexpr long double dt = 0.01; //Время dt в секундак
+constexpr int dt_int = dt * 1000; //Время dt в милисекундах
 
-using d_8 = long double;
+using d_8 = long double; //Заменяем long double на d_8
 
-struct vec {
+struct vec { //Вектор
     d_8 x = 0, y = 0, z = 0;
 };
 
-struct Point {
+struct Point { //Точка
     d_8 x, y, z;
     vec operator-(const Point& b) const {
         vec tmp;
@@ -32,7 +32,7 @@ struct Point {
     }
 };
 
-Point point(d_8 x, d_8 y, d_8 z) {
+Point point(d_8 x, d_8 y, d_8 z) { //Создать точку по трем координатам (переделать на конструктор)
     Point p;
     p.x = x;
     p.y = y;
@@ -40,12 +40,14 @@ Point point(d_8 x, d_8 y, d_8 z) {
     return p;
 }
 
-class atom {
+class atom { //Молекула
 private:
     
 public:
-    Point point, prevPoint;
-    vec v, a;
+    Point point, prevPoint; //Текущая и предыдущая точки
+    vec v, a; //Вектор скорости и ускорения
+    
+    //Функции для получения проекций
     d_8 x() const;
     d_8 y() const;
     d_8 z() const;
@@ -55,14 +57,15 @@ public:
     d_8 a_x() const;
     d_8 a_y() const;
     d_8 a_z() const;
-    void setCoor(const Point &p);
+    
+    void setCoor(const Point &p); //Установить новые координаты
 };
 
-struct Segment {
+struct Segment { //Отрезок
     d_8 x1, y1, z1;
     d_8 x2, y2, z2;
     
-    Segment(const atom &a) {
+    Segment(const atom &a) { //Конструктор от текцщего и предыдущего положения молекулы
         x1 = a.prevPoint.x;
         y1 = a.prevPoint.y;
         z1 = a.prevPoint.z;

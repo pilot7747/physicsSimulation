@@ -27,29 +27,30 @@ constexpr int maxX = windowSize - 200;
 constexpr int maxY = windowSize - 200;
 constexpr int maxZ = windowSize - 200;
 
-std::vector<atom> atoms;
-std::vector<border> planes;
-Render render(&atoms, &planes, _window);
-Engine engine(&atoms, &planes);
+std::vector<atom> atoms; //Массив малекул
+std::vector<border> planes; //Массив стенок сосуда
 
+Render render(&atoms, &planes, _window); //Рендер
+Engine engine(&atoms, &planes); //Движок
+
+//Функция, которую постоянно запускает GLUT
 void Idle() {
-    render.pressure = engine.pressure;
-    render.draw();
+    render.pressure = engine.pressure; //Предаем давление в рендер
+    render.draw(); //Отрисовываем
 }
 
+//Отрисовка
 void Display() {
     render.draw();
 }
 
+//Запуск GLUT
 void InitGlut(int argc, char *argv[]) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowSize(600, 600);
-    
-    //W_WIDTH = 1000;
-    //W_HEIGHT = 1000;
     glutInitWindowPosition(100, 200);
-    glutCreateWindow("Физика");
+    glutCreateWindow("Physics");
     glutDisplayFunc(Display);
     glutIdleFunc(Idle);
     //glutReshapeFunc(WindowReshape);
@@ -57,43 +58,44 @@ void InitGlut(int argc, char *argv[]) {
     glMatrixMode(GL_PROJECTION);
 }
 
+//Генерируем объекты
 void InitializeObjects(size_t size) {
-    border left;
+    border left; //Левая стенка
     left.p1 = point(-0.5, 0, -0.5);
     left.p2 = point(-0.5, 1.2, -0.5);
     left.p3 = point(-0.5, 0, 0.5);
     left.p4 = point(-0.5, 1.2, 0.5);
     left.type = borderType::vertical;
     
-    border right;
+    border right; //Правая
     right.p1 = point(0.5, 0, -0.5);
     right.p2 = point(0.5, 1.2, -0.5);
     right.p3 = point(0.5, 0, 0.5);
     right.p4 = point(0.5, 1.2, 0.5);
     right.type = borderType::vertical;
     
-    border up;
+    border up; //Верхняя
     up.p1 = point(-0.5, 0, 0.5);
     up.p2 = point(0.5, 1.2, 0.5);
     up.p3 = point(-0.5, 0, 0.5);
     up.p4 = point(0.5, 1.2, 0.5);
     up.type = borderType::horizontal;
     
-    border down;
+    border down; //Нижняя
     down.p1 = point(-0.5, 0, -0.5);
     down.p2 = point(0.5, 1.2, -0.5);
     down.p3 = point(-0.5, 0, -0.5);
     down.p4 = point(0.5, 1.2, -0.5);
     down.type = borderType::horizontal;
     
-    border background;
+    border background; //Задняя
     background.p1 = point(-0.5, 0, -0.5);
     background.p2 = point(-0.5, 0, 0.5);
     background.p3 = point(0.5, 0, 0.5);
     background.p4 = point(0.5, 0, -0.5);
     background.type = borderType::ortogonal;
     
-    border front;
+    border front; //Передняя
     front.p1 = point(-0.5, 1.2, -0.5);
     front.p2 = point(-0.5, 1.2, 0.5);
     front.p3 = point(0.5, 1.2, 0.5);
@@ -107,6 +109,7 @@ void InitializeObjects(size_t size) {
     planes.push_back(background);
     planes.push_back(front);
     
+    //Генерим молекулы
     for (int i = 0; i < size; ++i) {
         atom a;
         Point p = point((rand() % maxX) - 240, (rand() % maxY) - 240, (rand() % maxZ) - 240);
@@ -127,18 +130,18 @@ void InitializeObjects(size_t size) {
         atoms.push_back(a);
     }
 }
-
+//Стартуем
 void startThread() {
     engine.startEngine();
 }
 
 int main(int argc, char *argv[]) {
     srand(3);
-    InitializeObjects(100000);
+    InitializeObjects(100000); //Создаем объекты
     _window.width = 600;
     _window.height = 600;
     InitGlut(argc, argv);
-    std::thread thread(startThread);
+    std::thread thread(startThread); //Стартуем поток движка
     thread.detach();
     glutMainLoop();
     return 0;

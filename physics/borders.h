@@ -1,3 +1,4 @@
+//
 //  borders.h
 //  physics
 //
@@ -9,11 +10,11 @@
 #define borders_h
 #include "atom.h"
 
-enum class borderType {vertical, horizontal, ortogonal};
+enum class borderType {vertical, horizontal, ortogonal}; //Тип стенки (вертикальная, горизонтальная, перпендикулярная)
 
 struct border {
-    Point p1, p2, p3, p4;
-    borderType type;
+    Point p1, p2, p3, p4; // Четыре вершины прямоугольника
+    borderType type; // Тип
 };
 
 #endif /* borders_h */
