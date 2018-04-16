@@ -14,7 +14,7 @@
 #include <chrono>
 #include <thread>
 
-constexpr int intTimes = 20;
+constexpr int intTimes = 200;
 constexpr long double totalArea = 1 * 2 + 1.2 * 4;
 
 using namespace std::literals;
