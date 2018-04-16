@@ -12,7 +12,7 @@
 #include <GLUT/GLUT.h>
 #include <OpenGL/OpenGL.h>
 
-constexpr long double dt = 0.001;
+constexpr long double dt = 0.01;
 constexpr int dt_int = dt * 1000;
 
 using d_8 = long double;

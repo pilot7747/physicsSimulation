@@ -116,8 +116,14 @@ void InitializeObjects(size_t size) {
         a.setCoor(p);
         a.prevPoint = p;
         a.v.x = rand() % maximumSpeed;
+        if (rand() % 2)
+            a.v.x *= -1;
         a.v.y = rand() % maximumSpeed;
+        if (rand() % 2)
+            a.v.y *= -1;
         a.v.z = rand() % maximumSpeed;
+        if (rand() % 2)
+            a.v.z *= -1;
         atoms.push_back(a);
     }
 }
@@ -128,7 +134,7 @@ void startThread() {
 
 int main(int argc, char *argv[]) {
     srand(3);
-    InitializeObjects(1000);
+    InitializeObjects(100000);
     _window.width = 600;
     _window.height = 600;
     InitGlut(argc, argv);
