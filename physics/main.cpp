@@ -18,11 +18,14 @@
 #include "engine.h"
 #include "graphics.h"
 
-window _window(600, 600);
+constexpr int windowSize = 600;
 
-constexpr int maxX = 400;
-constexpr int maxY = 400;
-constexpr int maxZ = 400;
+
+window _window(windowSize, windowSize);
+
+constexpr int maxX = windowSize - 200;
+constexpr int maxY = windowSize - 200;
+constexpr int maxZ = windowSize - 200;
 
 std::vector<atom> atoms;
 std::vector<border> planes;
@@ -56,62 +59,65 @@ void InitGlut(int argc, char *argv[]) {
 
 void InitializeObjects(size_t size) {
     border left;
-    left.p1 = point(-250, 0, -250);
-    left.p2 = point(-250, 600, -250);
-    left.p3 = point(-250, 0, 250);
-    left.p4 = point(-250, 600, 250);
+    left.p1 = point(-0.5, 0, -0.5);
+    left.p2 = point(-0.5, 1.2, -0.5);
+    left.p3 = point(-0.5, 0, 0.5);
+    left.p4 = point(-0.5, 1.2, 0.5);
     left.type = borderType::vertical;
     
     border right;
-    right.p1 = point(250, 0, -250);
-    right.p2 = point(250, 600, -250);
-    right.p3 = point(250, 0, 250);
-    right.p4 = point(250, 600, 250);
+    right.p1 = point(0.5, 0, -0.5);
+    right.p2 = point(0.5, 1.2, -0.5);
+    right.p3 = point(0.5, 0, 0.5);
+    right.p4 = point(0.5, 1.2, 0.5);
     right.type = borderType::vertical;
     
     border up;
-    up.p1 = point(-250, 0, 250);
-    up.p2 = point(250, 600, 250);
-    up.p3 = point(-250, 0, 250);
-    up.p4 = point(250, 600, 250);
+    up.p1 = point(-0.5, 0, 0.5);
+    up.p2 = point(0.5, 1.2, 0.5);
+    up.p3 = point(-0.5, 0, 0.5);
+    up.p4 = point(0.5, 1.2, 0.5);
     up.type = borderType::horizontal;
     
     border down;
-    down.p1 = point(-250, 0, -250);
-    down.p2 = point(250, 600, -250);
-    down.p3 = point(-250, 0, -250);
-    down.p4 = point(250, 600, -250);
+    down.p1 = point(-0.5, 0, -0.5);
+    down.p2 = point(0.5, 1.2, -0.5);
+    down.p3 = point(-0.5, 0, -0.5);
+    down.p4 = point(0.5, 1.2, -0.5);
     down.type = borderType::horizontal;
     
-    /*border background;
-    background.p1 = point(-250, 0, -250);
-    background.p2 = point(-250, 0, 250);
-    background.p3 = point(250, 0, 250);
-    background.p4 = point(250, 0, -250);
+    border background;
+    background.p1 = point(-0.5, 0, -0.5);
+    background.p2 = point(-0.5, 0, 0.5);
+    background.p3 = point(0.5, 0, 0.5);
+    background.p4 = point(0.5, 0, -0.5);
     background.type = borderType::ortogonal;
     
     border front;
-    front.p1 = point(-250, 600, -250);
-    front.p2 = point(-250, 600, 250);
-    front.p3 = point(250, 600, 250);
-    front.p4 = point(250, 600, -250);
-    front.type = borderType::ortogonal;*/
+    front.p1 = point(-0.5, 1.2, -0.5);
+    front.p2 = point(-0.5, 1.2, 0.5);
+    front.p3 = point(0.5, 1.2, 0.5);
+    front.p4 = point(0.5, 1.2, -0.5);
+    front.type = borderType::ortogonal;
     
     planes.push_back(left);
     planes.push_back(right);
     planes.push_back(up);
     planes.push_back(down);
-    //planes.push_back(background);
-    //planes.push_back(front);
+    planes.push_back(background);
+    planes.push_back(front);
     
     for (int i = 0; i < size; ++i) {
         atom a;
         Point p = point((rand() % maxX) - 240, (rand() % maxY) - 240, (rand() % maxZ) - 240);
+        p.x /= 500.0;
+        p.y /= 600.0;
+        p.z /= 500.0;
         a.setCoor(p);
         a.prevPoint = p;
-        a.v.x = rand() % 482000;
-        a.v.y = rand() % 482000;
-        a.v.z = rand() % 482000;
+        a.v.x = rand() % 964;
+        a.v.y = rand() % 964;
+        a.v.z = rand() % 964;
         atoms.push_back(a);
     }
 }

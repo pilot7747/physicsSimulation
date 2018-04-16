@@ -95,15 +95,21 @@ double Render::coordZ(const d_8& z) {
 
 void Render::drawPlane(const border& b) {
     glBegin(GL_LINES);
-        glVertex2d(coordX(b.p1.x), coordZ(b.p1.z));
-        glVertex2d(coordX(b.p4.x), coordZ(b.p4.z));
+        glVertex2d(coordX(b.p1.x * w.width), coordZ(b.p1.z * w.height));
+        glVertex2d(coordX(b.p4.x * w.width), coordZ(b.p4.z * w.height));
     glEnd();
 }
 
 void Render::drawPoint(const atom &a) {
-    glBegin(GL_POLYGON);
+   /* glBegin(GL_POLYGON);
     for (d_8 i = 0; i < 2 * 3.14159; i += 3.14159 / 2.0)
-        glVertex3d(cos(i) * 0.01 + coordX(a.x()), sin(i) * 0.01 + coordZ(a.z()), 0);
+        glVertex3d(cos(i) * 0.01 + (double)(a.x()), sin(i) * 0.01 + double(a.z()), 0);
+    glEnd();
+    */
+    glPointSize(1.0f);
+    glBegin(GL_POINTS);
+        glColor3f(0.0, 1, 0.0);
+        glVertex2d((double)(a.x()), double(a.z()));
     glEnd();
 }
 

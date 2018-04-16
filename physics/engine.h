@@ -15,21 +15,28 @@
 #include <thread>
 
 constexpr int intTimes = 20;
+constexpr long double totalArea = 1 * 2 + 1.2 * 4;
 
 using namespace std::literals;
 
+bool diffSignes(const d_8& a, const d_8& b) {
+    if ((a <= 0 && b >= 0) || (a >= 0 && b <= 0))
+        return true;
+    return false;
+}
+
 bool intersects(const border& plane, const Point& a, const Point& b) {
-    int x, y, z;
+    long double x, y, z;
     if (plane.type == borderType::horizontal) {
         z = plane.p1.z;
-        return ((a.z - z) * (b.z - z)) <= 0;
+        return diffSignes(a.z - z, b.z - z);
     }
     if (plane.type == borderType::vertical) {
         x = plane.p1.x;
-        return ((a.x - x) * (b.x - x)) <= 0;
+        return diffSignes(a.x - x, b.x - x);
     }
     y = plane.p1.y;
-    return ((a.y - y) * (b.y - y)) <= 0;
+    return diffSignes(a.y - y, b.y - y);
 }
 
 
@@ -88,7 +95,7 @@ void Engine::startEngine() {
         for (int i = 0; i < intTimes; ++i) {
             doIntersections();
         }
-        pressure = tmpPres;
+        pressure = tmpPres / totalArea;
         tmpPres = 0;
         std::this_thread::sleep_for(std::chrono::milliseconds(dt_int));
     }

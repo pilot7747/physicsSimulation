@@ -12,13 +12,13 @@
 #include <GLUT/GLUT.h>
 #include <OpenGL/OpenGL.h>
 
-constexpr long double dt = 0.0001;
+constexpr long double dt = 0.001;
 constexpr int dt_int = dt * 1000;
 
 using d_8 = long double;
 
 struct vec {
-    d_8 x, y, z;
+    d_8 x = 0, y = 0, z = 0;
 };
 
 struct Point {
