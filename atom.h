@@ -15,7 +15,7 @@
 constexpr long double dt = 0.01; //Время dt в секундак
 constexpr int dt_int = dt * 1000; //Время dt в милисекундах
 
-constexpr long double totalArea = 1 * 6; //Площадь поверхности сосуда
+long double totalArea = 1 * 6; //Площадь поверхности сосуда
 constexpr long double massOfmolecule = 0.0000000000000000000000000482; //Масса молекулы
 constexpr long double k = 0.0000000000000000000000138065;
 

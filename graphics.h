@@ -78,8 +78,8 @@ void Render::drawDist() {
     distribution.resize(_disSz + 1);
     for (int i = 0; i < (*atoms).size(); ++i) {
         unsigned long long v = std::sqrt(((*atoms)[i].v * (*atoms)[i].v));
-        if (v / 10 <= _disSz) {
-            v /= 10;
+        if (v / 40 <= _disSz) {
+            v /= 40;
             ++distribution[v];
         }
     }
@@ -88,8 +88,8 @@ void Render::drawDist() {
     glColor3f(1, 1, 1);
     glBegin(GL_LINES);
     for (int i = 0; i < distribution.size(); ++i) {
-        glVertex2d(0.4 + (double(i) * 2) / (double)(w.width), -0.95);
-        glVertex2d(0.4 + (double(i) * 2) / (double)(w.width), ((double)(distribution[i]) / (double)(w.height)) / 20 - 0.95);
+        glVertex2d(0.4 + (double(i) * 3) / (double)(w.width), -0.95);
+        glVertex2d(0.4 + (double(i) * 3) / (double)(w.width), ((double)(distribution[i]) / (double)(w.height - 300)) /*/ 20*/ - 0.95);
     }
     glEnd();
 }

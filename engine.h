@@ -42,35 +42,6 @@ bool intersects(const border& plane, const Point& a, const Point& b) { //Про�
     return false;
 }
 
-void atomBumping(atom& a1, atom& a2) {
-    if (a1.v.equal(a2.v)) {
-        return;
-    }
-    while (true) {
-        if (rand() % 2) {
-            std::swap(a1, a2);
-        }
-        vec v1 = a1.v;
-        vec v2 = a2.v;
-        vec sum = v1 + v2;
-        d_8 energy = v1 * v1 + v2 * v2;
-        v1.x = v1.x * cos(rand());
-        v1.y = v1.y * cos(rand());
-        v1.z = v1.z * cos(rand());
-        auto D = (v1 * sum) * (v1 * sum) - 2 * (v1 * v1) * (sum * sum - energy);
-        if (D < 0) {
-            continue;
-        } else {
-            auto alpha = (v1 * sum - std::sqrt(D)) / (2 * (v1 * v1));
-            v1 *= alpha;
-            v2 = sum - v1;
-            auto _tmp = v1 * v1 + v2 * v2;
-            a1.v = v1;
-            a2.v = v2;
-            break;
-        }
-    }
-}
 
 class Engine { //Движок
 private:
@@ -81,6 +52,7 @@ private:
     void doBumps(); //Обработать столкновения
     void movePlanes();
     void calcDistribution();
+    void atomBumping(atom& a1, atom& a2);
     constexpr static unsigned long long max_speed = 1;
     
     void mirror(atom &a, const border &plane) { // Отразить относительно плоскости (можно, наверное, переделать)
@@ -114,6 +86,37 @@ public:
     bool calculated = true;
 };
 
+void Engine::atomBumping(atom& a1, atom& a2) {
+    if (a1.v.equal(a2.v)) {
+        --bumps;
+        return;
+    }
+    while (true) {
+        if (rand() % 2) {
+            std::swap(a1, a2);
+        }
+        vec v1 = a1.v;
+        vec v2 = a2.v;
+        vec sum = v1 + v2;
+        d_8 energy = v1 * v1 + v2 * v2;
+        v1.x = v1.x * cos(rand());
+        v1.y = v1.y * cos(rand());
+        v1.z = v1.z * cos(rand());
+        auto D = (v1 * sum) * (v1 * sum) - 2 * (v1 * v1) * (sum * sum - energy);
+        if (D < 0) {
+            continue;
+        } else {
+            auto alpha = (v1 * sum - std::sqrt(D)) / (2 * (v1 * v1));
+            v1 *= alpha;
+            v2 = sum - v1;
+            auto _tmp = v1 * v1 + v2 * v2;
+            a1.v = v1;
+            a2.v = v2;
+            break;
+        }
+    }
+}
+
 void Engine::changeCoords() {
     for (auto &atm : *atoms) {
         atm.setCoor(point(atm.point.x + atm.v.x * dt + atm.a.x * dt * dt / 2, atm.point.y + atm.v.y * dt + atm.a.y * dt * dt / 2, atm.point.z + atm.v.z * dt + atm.a.z * dt * dt / 2)); // x_0 + vt + at^2/2
@@ -134,7 +137,7 @@ void Engine::doIntersections() {
 void Engine::doBumps() {
     for (auto& atm1 : *atoms) {
         for (auto& atm2 : *atoms) {
-            if (atm1 != atm2 && atm1.getDistance(atm2) < 0.001) {
+            if (atm1 != atm2 && atm1.getDistance(atm2) < 0.0005) {
                 ++bumps;
                 atomBumping(atm1, atm2);
             }
