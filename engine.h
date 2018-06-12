@@ -87,32 +87,33 @@ public:
 };
 
 void Engine::atomBumping(atom& a1, atom& a2) {
-    if (a1.v.equal(a2.v)) {
+    if (a1.v.equal(a2.v)) { //Если скорости молекул почти сонаправлены, то считаем, что они все-таки не сталкиваются
         --bumps;
         return;
     }
     while (true) {
-        if (rand() % 2) {
-            std::swap(a1, a2);
-        }
-        vec v1 = a1.v;
-        vec v2 = a2.v;
-        vec sum = v1 + v2;
-        d_8 energy = v1 * v1 + v2 * v2;
-        v1.x = v1.x * cos(rand());
-        v1.y = v1.y * cos(rand());
-        v1.z = v1.z * cos(rand());
-        auto D = (v1 * sum) * (v1 * sum) - 2 * (v1 * v1) * (sum * sum - energy);
-        if (D < 0) {
-            continue;
+        vec v1 = a1.v; //Сохраняем сюда вектор скорости первой молекулы
+        vec v2 = a2.v; //Второй молекулы
+        vec sum = v1 + v2; //Суммарный импульс (масса молекул одинакова, поэтому здесь и дальше мы ее не учитываем
+        d_8 energy = v1 * v1 + v2 * v2; //Удвоенная кинетическая энергия
+        v1.x = v1.x * cos(rand()); //Случайный угол
+        v1.y = v1.y * cos(rand()); //Случайный угол
+        v1.z = v1.z * cos(rand()); //Случайный угол
+        auto D = (v1 * sum) * (v1 * sum) - 2 * (v1 * v1) * (sum * sum - energy); //Считаем дискриминант, деленный на 4 у квадратного уравнения 2a * |v1|^2 - 2a(v, sum) + |sum|^2 - energy = 0
+        //где a — коэффициент, на который необходимо домножить вектор v1
+        if (D < 0) { //Бывает такое, что с выбранный угол не реализуется
+            continue; //В таком случае ничего не остается, кроме того, чтобы попробовать еще раз
         } else {
-            auto alpha = (v1 * sum - std::sqrt(D)) / (2 * (v1 * v1));
-            v1 *= alpha;
-            v2 = sum - v1;
-            auto _tmp = v1 * v1 + v2 * v2;
-            a1.v = v1;
+            auto alpha = (v1 * sum - std::sqrt(D)) / (2 * (v1 * v1)); //если все таки получилось, то считаем коэффициент альфа
+            v1 *= alpha; //Домножаем на него v1
+            v2 = sum - v1; // Вычитаем из суммы полученный вектор
+            auto _tmp = v1 * v1 + v2 * v2; //Здесь для отладки проверяем совпала ли энергия
+            if (std::abs(_tmp - energy) > 0.01) {
+                std::cout << 1;
+            }
+            a1.v = v1; //Присваиваем скорости молекулам
             a2.v = v2;
-            break;
+            break; //Выходим
         }
     }
 }
@@ -134,12 +135,13 @@ void Engine::doIntersections() {
     }
 }
 
+//Перебираем все пары молекул
 void Engine::doBumps() {
     for (auto& atm1 : *atoms) {
         for (auto& atm2 : *atoms) {
-            if (atm1 != atm2 && atm1.getDistance(atm2) < 0.0005) {
-                ++bumps;
-                atomBumping(atm1, atm2);
+            if (atm1 != atm2 && atm1.getDistance(atm2) < 0.001) { //Если расстояние меньше 1мм, то сталкиваем их
+                ++bumps; //Увеличиваем счетчик столкновений
+                atomBumping(atm1, atm2); //Запускаем функцию выше
             }
         }
     }

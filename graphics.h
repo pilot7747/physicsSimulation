@@ -89,7 +89,7 @@ void Render::drawDist() {
     glBegin(GL_LINES);
     for (int i = 0; i < distribution.size(); ++i) {
         glVertex2d(0.4 + (double(i) * 3) / (double)(w.width), -0.95);
-        glVertex2d(0.4 + (double(i) * 3) / (double)(w.width), ((double)(distribution[i]) / (double)(w.height - 300)) /*/ 20*/ - 0.95);
+        glVertex2d(0.4 + (double(i) * 3) / (double)(w.width), ((double)(distribution[i]) / (double)(w.height - 300)) / (double(atoms->size()) / 10000.0) - 0.95);
     }
     glEnd();
 }

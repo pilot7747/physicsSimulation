@@ -134,60 +134,6 @@ void setVexel(double size, double speed = 0, bool piston = false) {
 
 //Генерируем объекты
 void InitializeObjects(size_t size) {
-    /*border left; //Левая стенка
-    left.p1 = point(-0.5, -0.5, -0.5);
-    left.p2 = point(-0.5, 0.5, -0.5);
-    left.p3 = point(-0.5, -0.5, 0.5);
-    left.p4 = point(-0.5, 0.5, 0.5);
-    left.type = borderType::vertical;
-    //left.v.x = 0.001;
-    
-    border right; //Правая
-    right.p1 = point(0.5, -0.5, -0.5);
-    right.p2 = point(0.5, 0.5, -0.5);
-    right.p3 = point(0.5, -0.5, 0.5);
-    right.p4 = point(0.5, 0.5, 0.5);
-    right.type = borderType::vertical;
-    //right.v.x = -0.001;
-    
-    border up; //Верхняя
-    up.p1 = point(-0.5, -0.5, 0.5);
-    up.p2 = point(0.5, 0.5, 0.5);
-    up.p3 = point(-0.5, -0.5, 0.5);
-    up.p4 = point(0.5, 0.5, 0.5);
-    up.type = borderType::horizontal;
-    //up.v.z = -0.001;
-    
-    border down; //Нижняя
-    down.p1 = point(-0.5, -0.5, -0.5);
-    down.p2 = point(0.5, 0.5, -0.5);
-    down.p3 = point(-0.5, -0.5, -0.5);
-    down.p4 = point(0.5, 0.5, -0.5);
-    down.type = borderType::horizontal;
-    //down.v.z = 0.001;
-    
-    border background; //Задняя
-    background.p1 = point(-0.5, -0.5, -0.5);
-    background.p2 = point(-0.5, -0.5, 0.5);
-    background.p3 = point(0.5, -0.5, 0.5);
-    background.p4 = point(0.5, -0.5, -0.5);
-    background.type = borderType::ortogonal;
-    //background.v.y = 0.001;
-    
-    border front; //Передняя
-    front.p1 = point(-0.5, 0.5, -0.5);
-    front.p2 = point(-0.5, 0.5, 0.5);
-    front.p3 = point(0.5, 0.5, 0.5);
-    front.p4 = point(0.5, 0.5, -0.5);
-    front.type = borderType::ortogonal;
-    //front.v.y = -0.001;
-    
-    planes.push_back(left);
-    planes.push_back(right);
-    planes.push_back(up);
-    planes.push_back(down);
-    planes.push_back(background);
-    planes.push_back(front);*/
     
     double vexel_size = 0.15;
     
@@ -227,7 +173,7 @@ void startThread() {
 int main(int argc, char *argv[]) {
     render.max_speed = static_cast<unsigned long long>((long double)(maximumSpeed) * 1.73205);
     srand(4);
-    InitializeObjects(10000); //Создаем объекты
+    InitializeObjects(1000); //Создаем объекты
     _window.width = 800;
     _window.height = 800;
     InitGlut(argc, argv);
