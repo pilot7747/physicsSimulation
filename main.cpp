@@ -150,6 +150,7 @@ void InitializeObjects(size_t size) {
         p.y /= 500.0;
         p.z /= 500.0;*/
         Point p = point(distribution(generator), distribution(generator), distribution(generator));
+        p.y = 0;
         a.setCoor(p);
         a.prevPoint = p;
         a.v.x = rand() % maximumSpeed + 1;
@@ -158,6 +159,7 @@ void InitializeObjects(size_t size) {
         a.v.y = rand() % maximumSpeed + 1;
         if (rand() % 2)
             a.v.y *= -1;
+        //a.v.y = 0;
         a.v.z = rand() % maximumSpeed + 1;
         if (rand() % 2)
             a.v.z *= -1;

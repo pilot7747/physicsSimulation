@@ -12,7 +12,7 @@
 #include <GLUT/GLUT.h>
 #include <OpenGL/OpenGL.h>
 
-constexpr long double dt = 0.000001; //Время dt в секундак
+constexpr long double dt = 0.0001; //Время dt в секундак
 constexpr int dt_int = dt * 1000; //Время dt в милисекундах
 
 long double totalArea = 1 * 6; //Площадь поверхности сосуда
@@ -51,6 +51,14 @@ struct vec { //Вектор
         tmp.x -= v.x;
         tmp.y -= v.y;
         tmp.z -= v.z;
+        return tmp;
+    }
+    
+    vec operator/(const d_8& d) const {
+        vec tmp = *this;
+        tmp.x /= d;
+        tmp.y /= d;
+        tmp.z /= d;
         return tmp;
     }
     

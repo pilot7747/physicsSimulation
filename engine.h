@@ -118,12 +118,36 @@ void Engine::atomBumping(atom& a1, atom& a2, std::uniform_real_distribution<long
         /*v1.x = std::cos(a); //Случайный угол
         v1.y = std::sin(a); //Случайный угол
         v1.z = dist2(generator); //Случайный угол*/
-        vec zero;
-        v1 = Rotate(v1.cross(v2).norm(), v1.norm(), a);
+        //vec zero;
+        
+        //v1 = Rotate(v1.cross(v2).norm(), v1.norm(), a);
+        vec z = v1.cross(v2);
+        z = z.norm();
+        vec dobavka = v2;
+        v1 -= v2;
+        v2 -= v2;
+        dobavka += v1 / 2;
+        vec t = v1 / 2;
+        v1 -= t;
+        v2 -= t;
+        vec x = v1;
+        x = x.norm();
+        vec y = x.cross(z);
+        y = y.norm();
+        x *= std::cos(a);
+        y *= std::sin(a);
+        vec v1n = x + y;
+        v1n *= std::sqrt(v1 * v1);
+        v1n += dobavka;
+        v1 = v1n;
+        v2 = sum - v1;
+        a1.v = v1;
+        a2.v = v2;
         //v1 *= 200;
         //dir << v1.x / std::sqrt(v1 * v1) << ";" << v1.y / std::sqrt(v1 * v1) << ";" << v1.z / std::sqrt(v1 * v1) << std::endl;
         ++i;
-        auto D = (v1 * sum) * (v1 * sum) - 2 * (v1 * v1) * (sum * sum - energy); //Считаем дискриминант, деленный на 4 у квадратного уравнения 2a * |v1|^2 - 2a(v, sum) + |sum|^2 - energy = 0
+        break;
+        /*auto D = (v1 * sum) * (v1 * sum) - 2 * (v1 * v1) * (sum * sum - energy); //Считаем дискриминант, деленный на 4 у квадратного уравнения 2a * |v1|^2 - 2a(v, sum) + |sum|^2 - energy = 0
         //где a — коэффициент, на который необходимо домножить вектор v1
         if (D < 0) { //Бывает такое, что с выбранный угол не реализуется
             continue; //В таком случае ничего не остается, кроме того, чтобы попробовать еще раз
@@ -137,12 +161,12 @@ void Engine::atomBumping(atom& a1, atom& a2, std::uniform_real_distribution<long
             v2 = sum - v1; // Вычитаем из суммы полученный вектор
             auto _tmp = v1 * v1 + v2 * v2; //Здесь для отладки проверяем совпала ли энергия
             if (std::abs(_tmp - energy) > 0.01) {
-                std::cout << 1;
+                assert("SHIT");
             }
             a1.v = v1; //Присваиваем скорости молекулам
             a2.v = v2;
             break; //Выходим
-        }
+        }*/
     }
 }
 
