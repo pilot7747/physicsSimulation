@@ -22,7 +22,7 @@
 //#include <omp.h>
 
 constexpr int windowSize = 800;
-constexpr unsigned long long maximumSpeed = 1000;
+constexpr unsigned long long maximumSpeed = 300;
 
 window _window(windowSize, windowSize);
 

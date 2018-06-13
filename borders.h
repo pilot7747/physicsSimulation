@@ -32,7 +32,7 @@ bool checkInVessel(border& left, border& right, border& up, border& down, Point&
     return true;
 }
 
-Point getCenter(border& left, border& right, border& up, border& down) { //Центр сосуда
+Point getCenter(border& left, border& right, border& up, border& down) { //Получить центр сосуда
     auto l = left.p1.x;
     auto r = right.p1.x;
     auto u = up.p1.z;

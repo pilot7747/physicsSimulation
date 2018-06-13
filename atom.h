@@ -12,12 +12,12 @@
 #include <GLUT/GLUT.h>
 #include <OpenGL/OpenGL.h>
 
-constexpr long double dt = 0.01; //Время dt в секундак
+constexpr long double dt = 0.000001; //Время dt в секундак
 constexpr int dt_int = dt * 1000; //Время dt в милисекундах
 
 long double totalArea = 1 * 6; //Площадь поверхности сосуда
 constexpr long double massOfmolecule = 0.0000000000000000000000000482; //Масса молекулы
-constexpr long double k = 0.0000000000000000000000138065;
+constexpr long double k = 0.0000000000000000000000138065; //Постоянная Больцмана
 
 using d_8 = long double; //Заменяем long double на d_8
 
@@ -25,6 +25,8 @@ struct vec { //Вектор
     d_8 x = 0, y = 0, z = 0;
     vec() : x(0), y(0), z(0) {}
     explicit vec(d_8 _x, d_8 _y, d_8 _z) : x(_x), y(_y), z(_z) {}
+    
+    //Прегруженные операторы сложения и вычитания для векторов
     vec& operator-=(const vec& v) {
         x -= v.x;
         y -= v.y;
@@ -37,35 +39,53 @@ struct vec { //Вектор
         z += v.z;
         return *this;
     }
-    vec operator+(const vec& v) {
+    vec operator+(const vec& v) const {
         vec tmp = *this;
         tmp.x += v.x;
         tmp.y += v.y;
         tmp.z += v.z;
         return tmp;
     }
-    vec operator-(const vec& v) {
+    vec operator-(const vec& v) const {
         vec tmp = *this;
         tmp.x -= v.x;
         tmp.y -= v.y;
         tmp.z -= v.z;
         return tmp;
     }
-    d_8 operator*(const vec& v) {
+    
+    d_8 operator*(const vec& v) const { // Скалярное произведение векторов
         return x * v.x + y * v.y + z * v.z;
     }
-    vec& operator*=(const d_8& a) {
+    
+    vec& operator*=(const d_8& a) { // Умножение вектора на число
         x *= a;
         y *= a;
         z *= a;
         return *this;
     }
-    bool equal(const vec& v) {
+    
+    bool equal(const vec& v) const { // Приблизительная проверка равенства векторов
         vec tmp = *this - v;
         if (tmp * tmp < 0.05) {
             return true;
         }
         return false;
+    }
+    vec cross(const vec& v2) const {
+        vec res;
+        res.x = y * v2.z - v2.y * z;
+        res.y = z * v2.x - v2.z * x;
+        res.z = x * v2.y - v2.x * y;
+        return res;
+    }
+    vec norm() const {
+        long double len = std::sqrt(x * x + y * y + z * z);
+        vec tmp = *this;
+        tmp.x /= len;
+        tmp.y /= len;
+        tmp.z /= len;
+        return tmp;
     }
 };
 
@@ -161,7 +181,7 @@ d_8 atom::get_v() const {
     return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 }
 
-void atom::setCoor(const Point &p) {
+void atom::setCoor(const Point &p) { //Установить координаты точки
     prevPoint = point;
     point.x = p.x;
     point.y = p.y;
