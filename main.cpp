@@ -135,7 +135,7 @@ void setVexel(double size, double speed = 0, bool piston = false) {
 //Генерируем объекты
 void InitializeObjects(size_t size) {
     
-    double vexel_size = 0.15;
+    double vexel_size = 1; // Cорона куба
     
     setVexel(vexel_size);
     
@@ -175,7 +175,7 @@ void startThread() {
 int main(int argc, char *argv[]) {
     render.max_speed = static_cast<unsigned long long>((long double)(maximumSpeed) * 1.73205);
     srand(4);
-    InitializeObjects(1000); //Создаем объекты
+    InitializeObjects(10000); //Создаем объекты
     _window.width = 800;
     _window.height = 800;
     InitGlut(argc, argv);

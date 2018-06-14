@@ -12,9 +12,9 @@
 #include <GLUT/GLUT.h>
 #include <OpenGL/OpenGL.h>
 
-constexpr long double dt = 0.0001; //Время dt в секундак
+constexpr long double dt = 0.01; //Время dt в секундак
 constexpr int dt_int = dt * 1000; //Время dt в милисекундах
-
+long double totV = 1;
 long double totalArea = 1 * 6; //Площадь поверхности сосуда
 constexpr long double massOfmolecule = 0.0000000000000000000000000482; //Масса молекулы
 constexpr long double k = 0.0000000000000000000000138065; //Постоянная Больцмана

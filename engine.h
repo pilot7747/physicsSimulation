@@ -16,6 +16,7 @@
 #include <iostream>
 #include <fstream>
 #include <random>
+#include <iomanip>
 
 constexpr int intTimes = 500; //Количество раз, сколько нужно отработать удары об стенки
 
@@ -48,6 +49,7 @@ bool intersects(const border& plane, const Point& a, const Point& b) { //Про�
 
 class Engine { //Движок
 private:
+    long long times = 0;
     std::ofstream dir;
     std::vector<atom>* atoms; //Указатель на массив молекул
     std::vector<border>* planes; //Указатель на массив стенок
@@ -74,7 +76,9 @@ private:
             a.v.y *= -1;
             tmpPres += (abs(a.v.y) * 2 / dt) * massOfmolecule; //Изменение имульса
         }
-        a.v += plane.v;
+        vec v = plane.v;
+        v *= 1;
+        a.v += v;
     }
     
 public:
@@ -201,22 +205,27 @@ void Engine::doBumps(std::uniform_real_distribution<long double>& dist1, std::un
 
 //Функция, которая двигает стенки сосуда, в данном примере не используется
 void Engine::movePlanes() {
+    d_8 speed = 0;
     for (auto& plane : *planes) {
-        plane.p1.x += plane.v.x;
-        plane.p2.x += plane.v.x;
-        plane.p3.x += plane.v.x;
-        plane.p4.x += plane.v.x;
+        if (plane.v.x != 0)
+            speed = plane.v.x;
+        plane.p1.x += plane.v.x * dt;
+        plane.p2.x += plane.v.x * dt;
+        plane.p3.x += plane.v.x * dt;
+        plane.p4.x += plane.v.x * dt;
         
-        plane.p1.y += plane.v.y;
-        plane.p2.y += plane.v.y;
-        plane.p3.y += plane.v.y;
-        plane.p4.y += plane.v.y;
+        plane.p1.y += plane.v.y * dt;
+        plane.p2.y += plane.v.y * dt;
+        plane.p3.y += plane.v.y * dt;
+        plane.p4.y += plane.v.y * dt;
         
-        plane.p1.z += plane.v.z;
-        plane.p2.z += plane.v.z;
-        plane.p3.z += plane.v.z;
-        plane.p4.z += plane.v.z;
+        plane.p1.z += plane.v.z * dt;
+        plane.p2.z += plane.v.z * dt;
+        plane.p3.z += plane.v.z * dt;
+        plane.p4.z += plane.v.z * dt;
     }
+    totalArea -= std::abs(speed) * dt * 4;
+    totV -= std::abs(speed) * dt;
 }
 
 
@@ -226,6 +235,9 @@ void Engine::startEngine() { //Эта функция запускается в �
     std::default_random_engine generator;
     std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
     std::uniform_real_distribution<long double> dist2(-1, 1);
+    std::ofstream ad("ad.csv");
+    ad << "P;V" << std::endl;
+    ad << std::fixed << std::setprecision(20);
     while (true) {
         movePlanes();
         changeCoords();// Пересчитываем координаты
@@ -239,8 +251,11 @@ void Engine::startEngine() { //Эта функция запускается в �
         tmpPres = 0; //Сбрасываем давление
         std::this_thread::sleep_for(std::chrono::milliseconds(dt_int)); //Ждем dt
         timeLapsed += dt;
-        
-        if (bumps > atoms->size()) {
+        if (times % 10 == 9 && totV > 0.001) {
+            ad << pressure << ";" << totV << std::endl;
+        }
+        ++times;
+        if (bumps > atoms->size() * 3) {
             std::ofstream os("output.csv");
             os << "vx" << ";" << "vy" << ";" << "vz" << ";" << "x" << ";" << "y" << ";" << "z" << std::endl;
             for (const auto& atom : *atoms) {
@@ -248,6 +263,7 @@ void Engine::startEngine() { //Эта функция запускается в �
             }
             std::cout << 1;
             os.close();
+            std::exit(0);
         }
     }
     dir.close();
