@@ -163,7 +163,7 @@ void InitializeObjects(size_t size) {
         a.v.z = rand() % maximumSpeed + 1;
         if (rand() % 2)
             a.v.z *= -1;
-        //a.a.z = -9.8;
+        a.a.z = -9.8;
         atoms.push_back(a);
     }
 }
@@ -175,7 +175,7 @@ void startThread() {
 int main(int argc, char *argv[]) {
     render.max_speed = static_cast<unsigned long long>((long double)(maximumSpeed) * 1.73205);
     srand(4);
-    InitializeObjects(10000); //Создаем объекты
+    InitializeObjects(1000); //Создаем объекты
     _window.width = 800;
     _window.height = 800;
     InitGlut(argc, argv);
