@@ -8,7 +8,6 @@
 #pragma once
 #include <iostream>
 #include <GLUT/GLUT.h>
-//#include "/usr/local/Cellar/glfw/3.2.1/include/GLFW/glfw3.h"
 #include <OpenGL/OpenGL.h>
 #include <cmath>
 #include <vector>
@@ -22,7 +21,7 @@
 //#include <omp.h>
 
 constexpr int windowSize = 800;
-constexpr unsigned long long maximumSpeed = 300;
+constexpr unsigned long long maximumSpeed = 1;
 
 window _window(windowSize, windowSize);
 
@@ -154,15 +153,20 @@ void InitializeObjects(size_t size) {
         a.setCoor(p);
         a.prevPoint = p;
         a.v.x = rand() % maximumSpeed + 1;
-        if (rand() % 2)
+        if (rand() % 2) {
             a.v.x *= -1;
+        }
         a.v.y = rand() % maximumSpeed + 1;
-        if (rand() % 2)
+        if (rand() % 2) {
             a.v.y *= -1;
-        //a.v.y = 0;
+        }
+
         a.v.z = rand() % maximumSpeed + 1;
-        if (rand() % 2)
+        if (rand() % 2) {
             a.v.z *= -1;
+        }
+        a.v.x /= 100;
+        a.v.y /= 100;
         a.a.z = -9.8;
         atoms.push_back(a);
     }
@@ -175,7 +179,7 @@ void startThread() {
 int main(int argc, char *argv[]) {
     render.max_speed = static_cast<unsigned long long>((long double)(maximumSpeed) * 1.73205);
     srand(4);
-    InitializeObjects(1000); //Создаем объекты
+    InitializeObjects(5000); //Создаем объекты
     _window.width = 800;
     _window.height = 800;
     InitGlut(argc, argv);

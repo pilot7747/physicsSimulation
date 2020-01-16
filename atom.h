@@ -145,6 +145,8 @@ public:
         return sqrtl((point.x - atm.x()) * (point.x - atm.x()) + (point.y - atm.y()) * (point.y - atm.y()) + (point.z - atm.z()) * (point.z - atm.z()));
     }
     void setCoor(const Point &p); //Установить новые координаты
+
+    friend std::ostream& operator<<(std::ostream &in,  const atom &c);
 };
 
 struct Segment { //Отрезок
@@ -185,6 +187,18 @@ d_8 atom::v_z() const {
     return (point - prevPoint).z / dt;
 }
 
+d_8 atom::a_x() const {
+    return 0.0;
+}
+
+d_8 atom::a_y() const {
+    return 0.0;
+}
+
+d_8 atom::a_z() const {
+    return 0.0;
+}
+
 d_8 atom::get_v() const {
     return std::sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 }
@@ -194,6 +208,11 @@ void atom::setCoor(const Point &p) { //Установить координаты
     point.x = p.x;
     point.y = p.y;
     point.z = p.z;
+}
+
+std::ostream& operator<<(std::ostream& out, const atom& c) {
+    out << c.x() << std::endl << c.y() << std::endl << c.z() << std::endl << c.v_x() << std::endl << c.v_y() << std::endl << c.v_z() << std::endl << c.a_x() << std::endl << c.a_y() << std::endl << c.a_z() << std::endl;
+    return out;
 }
 
 #endif /* atom_h */

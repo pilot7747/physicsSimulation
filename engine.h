@@ -20,6 +20,7 @@
 
 constexpr int intTimes = 500; //Количество раз, сколько нужно отработать удары об стенки
 
+unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
 
 using namespace std::literals;
 
@@ -54,10 +55,12 @@ private:
     std::vector<atom>* atoms; //Указатель на массив молекул
     std::vector<border>* planes; //Указатель на массив стенок
     void changeCoords(); //Пересчитать координаты
-    void doIntersections(); //Обработать удары об стенки
+    void doIntersections();
+    void doIntersectionsOneThread(size_t left, size_t right); //Обработать удары об стенки
+    void doBumpOneThread(size_t left, size_t right);
     void doBumps(std::uniform_real_distribution<long double>& dist1, std::uniform_real_distribution<long double>& dist2, std::default_random_engine& generator); //Обработать столкновения
     void movePlanes(); //Передвинуть стенки сосуда
-    void atomBumping(atom& a1, atom& a2, std::uniform_real_distribution<long double>& dist1, std::uniform_real_distribution<long double>& dist2, std::default_random_engine& generator); //Столкновение молекул
+    void atomBumping(atom& a1, atom& a2, std::uniform_real_distribution<long double>& dist1, std::default_random_engine& generator); //Столкновение молекул
     constexpr static unsigned long long max_speed = 1;
     
     void mirror(atom &a, const border &plane) { // Отразить относительно плоскости (можно, наверное, переделать)
@@ -80,7 +83,14 @@ private:
         v *= 1;
         a.v += v;
     }
-    
+
+    void PrintAtoms() {
+        for (auto&& atom : *atoms) {
+            std::cout << atom;
+        }
+    }
+
+
 public:
     std::vector<unsigned long long> distribution;
     long double tmpPres = 0; //Суммарная сила на стенки сосуда за время dt
@@ -103,7 +113,7 @@ inline vec Rotate(const vec& dir, const vec& x, const long double& a)
     return nx + y;
 }
 
-void Engine::atomBumping(atom& a1, atom& a2, std::uniform_real_distribution<long double>& dist1, std::uniform_real_distribution<long double>& dist2, std::default_random_engine& generator) {
+void Engine::atomBumping(atom& a1, atom& a2, std::uniform_real_distribution<long double>& dist1, std::default_random_engine& generator) {
     if (a1.v.equal(a2.v)) { //Если скорости молекул почти сонаправлены, то считаем, что они все-таки не сталкиваются
         --bumps;
         return;
@@ -119,12 +129,7 @@ void Engine::atomBumping(atom& a1, atom& a2, std::uniform_real_distribution<long
         vec sum = v1 + v2; //Суммарный импульс (масса молекул одинакова, поэтому здесь и дальше мы ее не учитываем
         d_8 energy = v1 * v1 + v2 * v2; //Удвоенная кинетическая энергия
         auto a = dist1(generator);
-        /*v1.x = std::cos(a); //Случайный угол
-        v1.y = std::sin(a); //Случайный угол
-        v1.z = dist2(generator); //Случайный угол*/
-        //vec zero;
-        
-        //v1 = Rotate(v1.cross(v2).norm(), v1.norm(), a);
+
         vec z = v1.cross(v2);
         z = z.norm();
         vec dobavka = v2;
@@ -147,30 +152,8 @@ void Engine::atomBumping(atom& a1, atom& a2, std::uniform_real_distribution<long
         v2 = sum - v1;
         a1.v = v1;
         a2.v = v2;
-        //v1 *= 200;
-        //dir << v1.x / std::sqrt(v1 * v1) << ";" << v1.y / std::sqrt(v1 * v1) << ";" << v1.z / std::sqrt(v1 * v1) << std::endl;
         ++i;
         break;
-        /*auto D = (v1 * sum) * (v1 * sum) - 2 * (v1 * v1) * (sum * sum - energy); //Считаем дискриминант, деленный на 4 у квадратного уравнения 2a * |v1|^2 - 2a(v, sum) + |sum|^2 - energy = 0
-        //где a — коэффициент, на который необходимо домножить вектор v1
-        if (D < 0) { //Бывает такое, что с выбранный угол не реализуется
-            continue; //В таком случае ничего не остается, кроме того, чтобы попробовать еще раз
-        } else {
-            long double alpha;
-            if (rand() % 2 == 0)
-                alpha = (v1 * sum + std::sqrt(D)) / (2 * (v1 * v1)); //если все таки получилось, то считаем коэффициент альфа
-            else
-                alpha = (v1 * sum - std::sqrt(D)) / (2 * (v1 * v1)); //если все таки получилось, то считаем коэффициент альфа
-            v1 *= alpha; //Домножаем на него v1
-            v2 = sum - v1; // Вычитаем из суммы полученный вектор
-            auto _tmp = v1 * v1 + v2 * v2; //Здесь для отладки проверяем совпала ли энергия
-            if (std::abs(_tmp - energy) > 0.01) {
-                assert("SHIT");
-            }
-            a1.v = v1; //Присваиваем скорости молекулам
-            a2.v = v2;
-            break; //Выходим
-        }*/
     }
 }
 
@@ -181,11 +164,39 @@ void Engine::changeCoords() {
     }
 }
 
-void Engine::doIntersections() { // Обработать пересечение перемещения молекулы со стенкой сосуда
-    for (auto &atm : *atoms) {
+void Engine::doIntersectionsOneThread(size_t left, size_t right) { // Обработать пересечение перемещения молекулы со стенкой сосуда
+    for (size_t i = left; i < right; ++i) {
         for (auto &plane : *planes) {
-            if (intersects(plane, getCenter((*planes)[0], (*planes)[1], (*planes)[2], (*planes)[3]), atm.point)) { //Для каждой пары (молекула, стенка сосуда) проверяем пересекает ли отрезок с концами в центре сосуда и текущем положении молекулы стенку сосуда
-                mirror(atm, plane); // Если да, то отражаем молекулу от стенки
+            if (intersects(plane, getCenter((*planes)[0], (*planes)[1], (*planes)[2], (*planes)[3]), (*atoms)[i].point)) { //Для каждой пары (молекула, стенка сосуда) проверяем пересекает ли отрезок с концами в центре сосуда и текущем положении молекулы стенку сосуда
+                mirror((*atoms)[i], plane); // Если да, то отражаем молекулу от стенки
+            }
+        }
+    }
+}
+
+void Engine::doIntersections() { // Обработать пересечение перемещения молекулы со стенкой сосуда
+    size_t blocks_size = atoms->size() / concurentThreadsSupported;
+    size_t last_block = atoms->size() - (concurentThreadsSupported - 1) * (blocks_size);
+    std::vector<std::thread> threads;
+    for (size_t i = 0; i < concurentThreadsSupported - 1; ++i) {
+
+        threads.emplace_back(std::thread(&Engine::doIntersectionsOneThread, this, i * blocks_size, (i + 1) * blocks_size));
+    }
+    threads.emplace_back(std::thread(&Engine::doIntersectionsOneThread, this, (concurentThreadsSupported - 1) * blocks_size, (concurentThreadsSupported - 1) * blocks_size + last_block));
+
+    for (auto&& t : threads) {
+        t.join();
+    }
+}
+
+void Engine::doBumpOneThread(size_t left, size_t right) {
+    std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
+    std::default_random_engine generator;
+    for (int i = left; i < right; ++i) {
+        for (int j = i + 1; j < atoms->size(); ++j) {
+            if (i != j && (*atoms)[i].getDistance((*atoms)[j]) < 0.001) { //Если расстояние меньше 1мм, то сталкиваем их
+                ++bumps; //Увеличиваем счетчик столкновений
+                atomBumping((*atoms)[i], (*atoms)[j], dist1, generator); //Запускаем функцию выше
             }
         }
     }
@@ -193,13 +204,17 @@ void Engine::doIntersections() { // Обработать пересечение 
 
 //Перебираем все пары молекул
 void Engine::doBumps(std::uniform_real_distribution<long double>& dist1, std::uniform_real_distribution<long double>& dist2, std::default_random_engine& generator) {
-    for (int i = 0; i < atoms->size(); ++i) {
-        for (int j = i + 1; j < atoms->size(); ++j) {
-            if (i != j && (*atoms)[i].getDistance((*atoms)[j]) < 0.001) { //Если расстояние меньше 1мм, то сталкиваем их
-                ++bumps; //Увеличиваем счетчик столкновений
-                atomBumping((*atoms)[i], (*atoms)[j], dist1, dist2, generator); //Запускаем функцию выше
-            }
-        }
+    size_t blocks_size = atoms->size() / concurentThreadsSupported;
+    size_t last_block = atoms->size() - (concurentThreadsSupported - 1) * (blocks_size);
+    std::vector<std::thread> threads;
+    for (size_t i = 0; i < concurentThreadsSupported - 1; ++i) {
+
+        threads.emplace_back(std::thread(&Engine::doBumpOneThread, this, i * blocks_size, (i + 1) * blocks_size));
+    }
+    threads.emplace_back(std::thread(&Engine::doBumpOneThread, this, (concurentThreadsSupported - 1) * blocks_size, (concurentThreadsSupported - 1) * blocks_size + last_block));
+
+    for (auto&& t : threads) {
+        t.join();
     }
 }
 
@@ -207,8 +222,9 @@ void Engine::doBumps(std::uniform_real_distribution<long double>& dist1, std::un
 void Engine::movePlanes() {
     d_8 speed = 0;
     for (auto& plane : *planes) {
-        if (plane.v.x != 0)
+        if (plane.v.x != 0) {
             speed = plane.v.x;
+        }
         plane.p1.x += plane.v.x * dt;
         plane.p2.x += plane.v.x * dt;
         plane.p3.x += plane.v.x * dt;
@@ -228,10 +244,13 @@ void Engine::movePlanes() {
     totV -= std::abs(speed) * dt;
 }
 
-
 void Engine::startEngine() { //Эта функция запускается в отдельном потоке и постоянно обрабатывает следующее состояние системы через время dt
     dir.open("dir.csv");
     dir << "x;y;z" << std::endl;
+
+    //std::cout << concurentThreadsSupported << std::endl;
+
+    std::cout << atoms->size() << std::endl;
     std::default_random_engine generator;
     std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
     std::uniform_real_distribution<long double> dist2(-1, 1);
@@ -239,6 +258,7 @@ void Engine::startEngine() { //Эта функция запускается в �
     ad << "P;V" << std::endl;
     ad << std::fixed << std::setprecision(20);
     while (true) {
+        PrintAtoms();
         movePlanes();
         changeCoords();// Пересчитываем координаты
         
@@ -249,7 +269,7 @@ void Engine::startEngine() { //Эта функция запускается в �
         doBumps(dist1, dist2, generator); //Обрабатываем столкновения молекул
         pressure = tmpPres / totalArea; //Получаем давление, деля силу на площадь
         tmpPres = 0; //Сбрасываем давление
-        std::this_thread::sleep_for(std::chrono::milliseconds(dt_int)); //Ждем dt
+        //std::this_thread::sleep_for(std::chrono::milliseconds(dt_int)); //Ждем dt
         timeLapsed += dt;
         if (times % 10 == 9 && totV > 0.001) {
             ad << pressure << ";" << totV << std::endl;
