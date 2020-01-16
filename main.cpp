@@ -22,7 +22,7 @@
 //#include <omp.h>
 
 constexpr int windowSize = 800;
-constexpr unsigned long long maximumSpeed = 890;
+unsigned long long maximumSpeed = 890;
 
 //window _window(windowSize, windowSize);
 
@@ -166,9 +166,9 @@ void InitializeObjects(size_t size) {
         if (rand() % 2) {
             a.v.z *= -1;
         }
-        //a.v.x /= 100;
-        //a.v.y /= 100;
-        a.a.z = -9.8;
+        a.v.x /= 100;
+        a.v.y /= 100;
+        //a.a.z = -9.8;
         atoms.push_back(a);
     }
 }
@@ -179,7 +179,7 @@ void startThread() {
 
 int main(int argc, char *argv[]) {
     srand(4);
-
+    maximumSpeed = atoi(argv[2]);
     InitializeObjects(atoi(argv[1])); //Создаем объекты
 //    _window.width = 800;
 //    _window.height = 800;
