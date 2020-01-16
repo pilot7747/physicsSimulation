@@ -19,13 +19,12 @@
 #include "atom.h"
 #include "borders.h"
 #include "engine.h"
-#include "graphics.h"
 //#include <omp.h>
 
 constexpr int windowSize = 800;
 constexpr unsigned long long maximumSpeed = 890;
 
-window _window(windowSize, windowSize);
+//window _window(windowSize, windowSize);
 
 constexpr int maxX = windowSize - 200;
 constexpr int maxY = windowSize - 200;
@@ -34,11 +33,11 @@ constexpr int maxZ = windowSize - 200;
 std::vector<atom> atoms; //Массив малекул
 std::vector<border> planes; //Массив стенок сосуда
 
-Render render(&atoms, &planes, _window); //Рендер
+//Render render(&atoms, &planes, _window); //Рендер
 Engine engine(&atoms, &planes); //Движок
 
 //Функция, которую постоянно запускает GLUT
-void Idle() {
+/*void Idle() {
     render.pressure = engine.pressure; //Предаем давление в рендер
     render.bumps = engine.bumps;
     render.timeLapsed = engine.timeLapsed;
@@ -46,12 +45,12 @@ void Idle() {
     //    render.distribution = engine.distribution;
     //}
     render.draw(); //Отрисовываем
-}
+}*/
 
 //Отрисовка
-void Display() {
-    render.draw();
-}
+//void Display() {
+//    render.draw();
+//}
 
 //Запуск GLUT
 //void InitGlut(int argc, char *argv[]) {
@@ -179,9 +178,9 @@ void startThread() {
 }
 
 int main(int argc, char *argv[]) {
-    render.max_speed = static_cast<unsigned long long>((long double)(maximumSpeed) * 1.73205);
     srand(4);
-    InitializeObjects(5000); //Создаем объекты
+
+    InitializeObjects(atoi(argv[1])); //Создаем объекты
 //    _window.width = 800;
 //    _window.height = 800;
 //    InitGlut(argc, argv);

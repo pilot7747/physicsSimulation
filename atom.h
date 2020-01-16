@@ -9,8 +9,8 @@
 #ifndef atom_h
 #define atom_h
 #pragma once
-#include <GLUT/GLUT.h>
-#include <OpenGL/OpenGL.h>
+//#include <GLUT/GLUT.h>
+//#include <OpenGL/OpenGL.h>
 
 constexpr long double dt = 0.01; //Время dt в секундак
 constexpr int dt_int = dt * 1000; //Время dt в милисекундах

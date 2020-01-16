@@ -133,13 +133,13 @@ private:
         if (bmps % 2 == 1) {
             a.v.z *= -1;
         }
-        tmpPres.store(tmpPres.load() + (abs(a.v.z) * 2 / dt) * massOfmolecule * bmps);
+        tmpPres.store(tmpPres.load() + (std::abs(a.v.z) * 2 / dt) * massOfmolecule * bmps);
 
         bmps = ProcessBumpImpl(a.point.y, background.p1.y, front.p1.y);
         if (bmps % 2 == 1) {
             a.v.y *= -1;
         }
-        tmpPres.store(tmpPres.load() + (abs(a.v.y) * 2 / dt) * massOfmolecule * bmps);
+        tmpPres.store(tmpPres.load() + (std::abs(a.v.y) * 2 / dt) * massOfmolecule * bmps);
         /*
         // left and right
 
@@ -211,7 +211,7 @@ private:
 
 public:
     std::vector<unsigned long long> distribution;
-    std::atomic<long double> tmpPres = 0; //Суммарная сила на стенки сосуда за время dt
+    std::atomic<long double> tmpPres{0}; //Суммарная сила на стенки сосуда за время dt
     long double pressure = 0; //Давление
     long double timeLapsed = 0; //Просимулированное время
     unsigned long long bumps = 0; //Колво соударений

@@ -9,8 +9,8 @@
 #ifndef display_h
 #define display_h
 #pragma once
-#include <GLUT/GLUT.h>
-#include <OpenGL/OpenGL.h>
+//#include <GLUT/GLUT.h>
+//#include <OpenGL/OpenGL.h>
 #include <vector>
 #include <cmath>
 #include <string>
