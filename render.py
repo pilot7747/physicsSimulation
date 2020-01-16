@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
+import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -10,8 +11,14 @@ import subprocess
 from tqdm import tqdm
 from matplotlib.animation import FFMpegWriter
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--particles', required=True)
+parser.add_argument('--engine', required=True)
+parser.add_argument('--output', default='movie.mp4')
+args = parser.parse_args()
+
 def run_simulation():
-    ps = subprocess.Popen(['./a.out',  '100'], stdout=subprocess.PIPE)
+    ps = subprocess.Popen([args.engine,  args.particles], stdout=subprocess.PIPE)
     for c in iter(lambda: ps.stdout.readline(), b''):  # replace '' with b'' for Python 3
         yield float(c.decode('ascii'))
 
@@ -124,5 +131,5 @@ ani = animation.FuncAnimation(fig, update, nfr * 2 - 3, fargs=(xs, ys, zs, vs, b
 
 
 writer = FFMpegWriter(fps=fps, metadata=dict(artist='Me'), bitrate=20000)
-ani.save("movie.mp4", writer=writer)
+ani.save(args.output, writer=writer)
 progress.close()
