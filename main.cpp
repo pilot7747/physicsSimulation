@@ -166,9 +166,9 @@ void InitializeObjects(size_t size) {
         if (rand() % 2) {
             a.v.z *= -1;
         }
-        a.v.x /= 100;
-        a.v.y /= 100;
-        a.a.z = -9.8;
+        //a.v.x /= 100;
+        //a.v.y /= 100;
+        // a.a.z = -9.8;
         atoms.push_back(a);
     }
 }
