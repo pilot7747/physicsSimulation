@@ -1,9 +1,6 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[2]:
-
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,7 +11,7 @@ from tqdm import tqdm
 from matplotlib.animation import FFMpegWriter
 
 def run_simulation():
-    ps = subprocess.Popen('/Users/nikita/CLionProjects/physicsSimulation/cmake-build-debug/physics_simulation', stdout=subprocess.PIPE)
+    ps = subprocess.Popen(['./a.out',  '100'], stdout=subprocess.PIPE)
     for c in iter(lambda: ps.stdout.readline(), b''):  # replace '' with b'' for Python 3
         yield float(c.decode('ascii'))
 
@@ -91,8 +88,11 @@ pres_plt, = ax3.plot([], [])
 ax4 = fig.add_subplot(224)
 tmp_plt, = ax4.plot([], [])
 
+progress = tqdm(total=nfr * 2 - 3)
+
 def update(ifrm, xa, ya, za, va, ba, pa, ta):
-    print(ifrm)
+    progress.n = ifrm
+    progress.refresh()
     sct.set_data(xa[ifrm], ya[ifrm])
     sct.set_3d_properties(za[ifrm])
     ax.set_title('{} столкновений'.format(ba[ifrm]))
@@ -125,3 +125,4 @@ ani = animation.FuncAnimation(fig, update, nfr * 2 - 3, fargs=(xs, ys, zs, vs, b
 
 writer = FFMpegWriter(fps=fps, metadata=dict(artist='Me'), bitrate=20000)
 ani.save("movie.mp4", writer=writer)
+progress.close()
