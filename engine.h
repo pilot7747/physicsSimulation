@@ -10,6 +10,7 @@
 #define engine_h
 #include "atom.h"
 #include "borders.h"
+#include <atomic>
 #include <vector>
 #include <chrono>
 #include <thread>
@@ -62,38 +63,155 @@ private:
     void movePlanes(); //Передвинуть стенки сосуда
     void atomBumping(atom& a1, atom& a2, std::uniform_real_distribution<long double>& dist1, std::default_random_engine& generator); //Столкновение молекул
     constexpr static unsigned long long max_speed = 1;
-    
+
+    static int ProcessBumpImpl(long double& x, long double left, long double right) {
+        int bumps = 0;
+        long double size = right - left;
+        if (x >= right) {
+            x -= right;
+            bumps = 1;
+            auto bump_cnt = static_cast<long long>(std::abs(x) / size);
+            long double res = x - bump_cnt * size;
+            if (bump_cnt % 2 == 0) {
+                x = right - res;
+            } else {
+                x = left + res;
+            }
+            bumps += bump_cnt;
+        } else if (x <= left) {
+            x -= left;
+            bumps = 1;
+            auto bump_cnt = static_cast<long long>(std::abs(x) / size);
+            long double res = std::abs(x) - bump_cnt * size;
+            if (bump_cnt % 2 == 0) {
+                x = left + res;
+            } else {
+                x = right - res;
+            }
+            bumps += bump_cnt;
+        }
+        return bumps;
+    }
+
     void mirror(atom &a, const border &plane) { // Отразить относительно плоскости (можно, наверное, переделать)
         if (plane.type == borderType::horizontal) {
             a.point.z += (plane.p1.z - a.point.z) * 2;
             a.v.z *= -1;
-            tmpPres += (abs(a.v.z) * 2 / dt) * massOfmolecule; //Изменение имульса
+            tmpPres.store(tmpPres.load() + (std::abs(a.v.z) * 2 / dt) * massOfmolecule); //Изменение имульса
         }
         if (plane.type == borderType::vertical) {
             a.point.x += (plane.p1.x - a.point.x) * 2;
             a.v.x *= -1;
-            tmpPres += (abs(a.v.x) * 2 / dt) * massOfmolecule; //Изменение имульса
+            tmpPres.store(tmpPres.load() + (std::abs(a.v.x) * 2 / dt) * massOfmolecule); //Изменение имульса
         }
         if (plane.type == borderType::ortogonal) {
             a.point.y += (plane.p1.y - a.point.y) * 2;
             a.v.y *= -1;
-            tmpPres += (abs(a.v.y) * 2 / dt) * massOfmolecule; //Изменение имульса
+            tmpPres.store(tmpPres.load() + (std::abs(a.v.y) * 2 / dt) * massOfmolecule); //Изменение имульса
         }
         vec v = plane.v;
         v *= 1;
         a.v += v;
     }
 
+    void ProcessBump(atom& a) {
+
+        const border& left = (*planes)[0];
+        const border& right = (*planes)[1];
+        const border& top = (*planes)[2];
+        const border& bottom = (*planes)[3];
+        const border& background = (*planes)[4];
+        const border& front = (*planes)[5];
+
+        auto bmps = ProcessBumpImpl(a.point.x, left.p1.x, right.p1.x);
+        if (bmps % 2 == 1) {
+            a.v.x *= -1;
+        }
+        tmpPres.store(tmpPres.load() + (std::abs(a.v.x) * 2 / dt) * massOfmolecule * bmps);
+
+        bmps = ProcessBumpImpl(a.point.z, bottom.p1.z, top.p1.z);
+        if (bmps % 2 == 1) {
+            a.v.z *= -1;
+        }
+        tmpPres.store(tmpPres.load() + (abs(a.v.z) * 2 / dt) * massOfmolecule * bmps);
+
+        bmps = ProcessBumpImpl(a.point.y, background.p1.y, front.p1.y);
+        if (bmps % 2 == 1) {
+            a.v.y *= -1;
+        }
+        tmpPres.store(tmpPres.load() + (abs(a.v.y) * 2 / dt) * massOfmolecule * bmps);
+        /*
+        // left and right
+
+        const long double size_x = right.p1.x - left.p1.x;
+        if (a.point.x >= right.p1.x) {
+            auto bumps_num = static_cast<long long>(std::abs(a.point.x - left.p1.x) / size_x);
+            a.point.x -= size_x * bumps_num;
+            a.point.x = right.p1.x - a.point.x;
+            if (bumps_num % 2 == 1) {
+                a.v.x *= -1;
+            }
+        } else if (a.point.x <= left.p1.x) {
+            auto bumps_num = static_cast<long long>(std::abs(a.point.x - right.p1.x) / size_x);
+            a.point.x += size_x * bumps_num;
+            a.point.x += left.p1.x;
+            if (bumps_num % 2 == 1) {
+                a.v.x *= -1;
+            }
+        }
+
+        // top and bottom
+
+        const long double size_z = top.p1.z - bottom.p1.z;
+        if (a.point.z >= top.p1.z) {
+            auto bumps_num = static_cast<long long>(std::abs(a.point.z - bottom.p1.z) / size_z);
+            a.point.z -= size_z * bumps_num;
+            a.point.z = top.p1.z - a.point.z;
+            if (bumps_num % 2 == 1) {
+                a.v.z *= -1;
+            }
+        } else if (a.point.z <= bottom.p1.z) {
+            auto bumps_num = static_cast<long long>(std::abs(a.point.z - top.p1.z) / size_z);
+            a.point.z += size_z * bumps_num;
+            a.point.z += bottom.p1.z;
+            if (bumps_num % 2 == 1) {
+                a.v.z *= -1;
+            }
+        }
+
+        // ftont and background
+
+        const long double size_y = front.p1.y - background.p1.y;
+        if (a.point.y >= front.p1.y) {
+            auto bumps_num = static_cast<long long>(std::abs(a.point.y - background.p1.y) / size_y);
+            a.point.y -= size_y * bumps_num;
+            a.point.y = front.p1.y - a.point.y;
+            if (bumps_num % 2 == 1) {
+                a.v.y *= -1;
+            }
+        } else if (a.point.y <= background.p1.y) {
+            auto bumps_num = static_cast<long long>(std::abs(a.point.y - front.p1.y) / size_y);
+            a.point.y += size_z * bumps_num;
+            a.point.y += bottom.p1.y;
+            if (bumps_num % 2 == 1) {
+                a.v.y *= -1;
+            }
+        }*/
+    }
+
+
+
     void PrintAtoms() {
         for (auto&& atom : *atoms) {
             std::cout << atom;
         }
+
     }
 
 
 public:
     std::vector<unsigned long long> distribution;
-    long double tmpPres = 0; //Суммарная сила на стенки сосуда за время dt
+    std::atomic<long double> tmpPres = 0; //Суммарная сила на стенки сосуда за время dt
     long double pressure = 0; //Давление
     long double timeLapsed = 0; //Просимулированное время
     unsigned long long bumps = 0; //Колво соударений
@@ -166,11 +284,12 @@ void Engine::changeCoords() {
 
 void Engine::doIntersectionsOneThread(size_t left, size_t right) { // Обработать пересечение перемещения молекулы со стенкой сосуда
     for (size_t i = left; i < right; ++i) {
-        for (auto &plane : *planes) {
-            if (intersects(plane, getCenter((*planes)[0], (*planes)[1], (*planes)[2], (*planes)[3]), (*atoms)[i].point)) { //Для каждой пары (молекула, стенка сосуда) проверяем пересекает ли отрезок с концами в центре сосуда и текущем положении молекулы стенку сосуда
-                mirror((*atoms)[i], plane); // Если да, то отражаем молекулу от стенки
-            }
-        }
+        //for (auto &plane : *planes) {
+            //if (intersects(plane, getCenter((*planes)[0], (*planes)[1], (*planes)[2], (*planes)[3]), (*atoms)[i].point)) { //Для каждой пары (молекула, стенка сосуда) проверяем пересекает ли отрезок с концами в центре сосуда и текущем положении молекулы стенку сосуда
+            //    mirror((*atoms)[i], plane); // Если да, то отражаем молекулу от стенки
+            //}
+            ProcessBump((*atoms)[i]);
+        //}
     }
 }
 
@@ -251,6 +370,9 @@ void Engine::startEngine() { //Эта функция запускается в �
     //std::cout << concurentThreadsSupported << std::endl;
 
     std::cout << atoms->size() << std::endl;
+    std::cout << massOfmolecule << std::endl;
+    std::cout << k << std::endl;
+
     std::default_random_engine generator;
     std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
     std::uniform_real_distribution<long double> dist2(-1, 1);
@@ -262,13 +384,16 @@ void Engine::startEngine() { //Эта функция запускается в �
         movePlanes();
         changeCoords();// Пересчитываем координаты
         
-        for (int i = 0; i < intTimes; ++i) { //Нужное кол-во раз обрабатываем столкновения со стенками
-            doIntersections();
-        }
-        
+
+        doIntersections();
         doBumps(dist1, dist2, generator); //Обрабатываем столкновения молекул
-        pressure = tmpPres / totalArea; //Получаем давление, деля силу на площадь
-        tmpPres = 0; //Сбрасываем давление
+
+        pressure = tmpPres.load() / totalArea; //Получаем давление, деля силу на площадь
+
+        std::cout << bumps << std::endl;
+        std::cout << pressure << std::endl;
+
+        tmpPres.store(0); //Сбрасываем давление
         //std::this_thread::sleep_for(std::chrono::milliseconds(dt_int)); //Ждем dt
         timeLapsed += dt;
         if (times % 10 == 9 && totV > 0.001) {

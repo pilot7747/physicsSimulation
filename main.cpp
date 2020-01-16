@@ -7,8 +7,10 @@
 //
 #pragma once
 #include <iostream>
-#include <GLUT/GLUT.h>
-#include <OpenGL/OpenGL.h>
+
+//#include <GLUT/GLUT.h>
+//#include <OpenGL/OpenGL.h>
+
 #include <cmath>
 #include <vector>
 #include <thread>
@@ -21,7 +23,7 @@
 //#include <omp.h>
 
 constexpr int windowSize = 800;
-constexpr unsigned long long maximumSpeed = 1;
+constexpr unsigned long long maximumSpeed = 890;
 
 window _window(windowSize, windowSize);
 
@@ -52,18 +54,18 @@ void Display() {
 }
 
 //Запуск GLUT
-void InitGlut(int argc, char *argv[]) {
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-    glutInitWindowSize(800, 800);
-    glutInitWindowPosition(100, 200);
-    glutCreateWindow("Physics");
-    glutDisplayFunc(Display);
-    glutIdleFunc(Idle);
-    //glutReshapeFunc(WindowReshape);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
-    glMatrixMode(GL_PROJECTION);
-}
+//void InitGlut(int argc, char *argv[]) {
+//    glutInit(&argc, argv);
+//    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+//    glutInitWindowSize(800, 800);
+//    glutInitWindowPosition(100, 200);
+//    glutCreateWindow("Physics");
+//    glutDisplayFunc(Display);
+//    glutIdleFunc(Idle);
+//    //glutReshapeFunc(WindowReshape);
+//    glClearColor(0.0, 0.0, 0.0, 1.0);
+//    glMatrixMode(GL_PROJECTION);
+//}
 
 void setVexel(double size, double speed = 0, bool piston = false) {
     size /= 2;
@@ -180,11 +182,14 @@ int main(int argc, char *argv[]) {
     render.max_speed = static_cast<unsigned long long>((long double)(maximumSpeed) * 1.73205);
     srand(4);
     InitializeObjects(5000); //Создаем объекты
-    _window.width = 800;
-    _window.height = 800;
-    InitGlut(argc, argv);
-    std::thread thread(startThread); //Стартуем поток движка
-    thread.detach();
-    glutMainLoop();
+//    _window.width = 800;
+//    _window.height = 800;
+//    InitGlut(argc, argv);
+//
+//    std::thread thread(startThread); //Стартуем поток движка
+//    thread.detach();
+//    glutMainLoop();
+
+    startThread();
     return 0;
 }
