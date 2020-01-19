@@ -26,16 +26,12 @@ unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
 using namespace std::literals;
 
 bool diffSignes(const d_8& a, const d_8& b) { // Функция, которая проверяет разные ли знаки у двух чисел
-    if ((a <= 0 && b >= 0) || (a >= 0 && b <= 0))
-        return true;
-    return false;
+    return (a <= 0 && b >= 0) || (a >= 0 && b <= 0);
 }
 
 
 class Engine { //Движок
 private:
-    long long times = 0;
-    std::ofstream dir;
     std::vector<atom>* atoms; //Указатель на массив молекул
     std::vector<border>* planes; //Указатель на массив стенок
     void changeCoords(); //Пересчитать координаты
@@ -111,8 +107,6 @@ private:
         }
 
     }
-
-
 public:
     std::vector<unsigned long long> distribution;
     std::atomic<long double> tmpPres{0}; //Суммарная сила на стенки сосуда за время dt
@@ -263,11 +257,6 @@ void Engine::movePlanes() {
 }
 
 void Engine::startEngine() { //Эта функция запускается в отдельном потоке и постоянно обрабатывает следующее состояние системы через время dt
-    dir.open("dir.csv");
-    dir << "x;y;z" << std::endl;
-
-    //std::cout << concurentThreadsSupported << std::endl;
-
     std::cout << atoms->size() << std::endl;
     std::cout << massOfmolecule << std::endl;
     std::cout << k << std::endl;
@@ -275,9 +264,6 @@ void Engine::startEngine() { //Эта функция запускается в �
     std::default_random_engine generator;
     std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
     std::uniform_real_distribution<long double> dist2(-1, 1);
-    std::ofstream ad("ad.csv");
-    ad << "P;V" << std::endl;
-    ad << std::fixed << std::setprecision(20);
     while (true) {
         PrintAtoms();
         movePlanes();
@@ -295,22 +281,7 @@ void Engine::startEngine() { //Эта функция запускается в �
         tmpPres.store(0); //Сбрасываем давление
         //std::this_thread::sleep_for(std::chrono::milliseconds(dt_int)); //Ждем dt
         timeLapsed += dt;
-        if (times % 10 == 9 && totV > 0.001) {
-            ad << pressure << ";" << totV << std::endl;
-        }
-        ++times;
-        if (bumps > atoms->size() * 3) {
-            std::ofstream os("output.csv");
-            os << "vx" << ";" << "vy" << ";" << "vz" << ";" << "x" << ";" << "y" << ";" << "z" << std::endl;
-            for (const auto& atom : *atoms) {
-                os << atom.v.x << ";" << atom.v.y << ";" << atom.v.z << ";" << atom.x() << ";" << atom.y() << ";" << atom.z() << std::endl;
-            }
-            std::cout << 1;
-            os.close();
-            std::exit(0);
-        }
     }
-    dir.close();
 }
 
 
