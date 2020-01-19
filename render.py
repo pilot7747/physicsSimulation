@@ -22,7 +22,7 @@ parser.add_argument('--bitrate', default=20000, type=int)
 args = parser.parse_args()
 
 def run_simulation():
-    ps = subprocess.Popen([args.engine,  args.particles, str(int(float(args.speed) * 4))], stdout=subprocess.PIPE)
+    ps = subprocess.Popen([args.engine,  args.particles, str(int(float(args.speed)))], stdout=subprocess.PIPE)
     for c in iter(lambda: ps.stdout.readline(), b''):  # replace '' with b'' for Python 3
         yield float(c.decode('ascii'))
 
@@ -101,7 +101,7 @@ def update(ifrm, last_frm):
     ax.set_title('{} столкновений'.format(bs[ifrm]))
 
     ax2.clear()
-    ax2.hist(V, density=True, bins=np.linspace(0, 1.5 * float(args.speed), num=30), alpha=0.75)
+    ax2.hist(V, density=True, bins=np.linspace(0, 2 * float(args.speed), num=30), alpha=0.75)
     ax2.set_title('Среднеквадратичная скорость: {} м/с'.format(str(round(np.sqrt(np.nanmean(V ** 2)), 2))))
 
     timeline = np.linspace(0, float(ifrm + 1) / 100, ifrm + 1)
