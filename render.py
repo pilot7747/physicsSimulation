@@ -15,10 +15,13 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--particles', required=True)
 parser.add_argument('--engine', required=True)
 parser.add_argument('--output', default='movie.mp4')
+parser.add_argument('--speed', default=300)
+parser.add_argument('--duration', default=60, type=int)
+
 args = parser.parse_args()
 
 def run_simulation():
-    ps = subprocess.Popen([args.engine,  args.particles], stdout=subprocess.PIPE)
+    ps = subprocess.Popen([args.engine,  args.particles, str(int(float(args.speed) * 4))], stdout=subprocess.PIPE)
     for c in iter(lambda: ps.stdout.readline(), b''):  # replace '' with b'' for Python 3
         yield float(c.decode('ascii'))
 
@@ -55,7 +58,7 @@ def step():
     pressure = next(sim_res)
     return bumps, pressure
 
-nfr = 3000 # Number of frames
+nfr = args.duration * 50 # Number of frames
 fps = 100 # Frame per sec
 xs = []
 ys = []
@@ -82,7 +85,7 @@ for i in range(len(vs)):
     ts[i] = (np.nanmean(vs[i] ** 2) * mass_of_molecule / 3.0) / k
 
 
-fig = plt.figure(figsize=(20, 20), dpi=150)
+fig = plt.figure(figsize=(16, 16), dpi=150)
 ax = fig.add_subplot(221, projection='3d')
 sct, = ax.plot([], [], [], "o", markersize=2)
 
@@ -105,7 +108,7 @@ def update(ifrm, xa, ya, za, va, ba, pa, ta):
     ax.set_title('{} столкновений'.format(ba[ifrm]))
 
     ax2.clear()
-    ax2.hist(va[ifrm], density=True, bins=np.linspace(0, 1000, num=30), alpha=0.75)
+    ax2.hist(va[ifrm], density=True, bins=np.linspace(0, 1.5 * float(args.speed), num=30), alpha=0.75)
     ax2.set_title('Среднеквадратичная скорость: {} м/с'.format(str(round(np.sqrt(np.nanmean(va[ifrm] ** 2)), 2))))
 
     timeline = np.linspace(0, float(ifrm + 1) / 100, ifrm + 1)
