@@ -33,38 +33,8 @@ constexpr int maxZ = windowSize - 200;
 std::vector<atom> atoms; //Массив малекул
 std::vector<border> planes; //Массив стенок сосуда
 
-//Render render(&atoms, &planes, _window); //Рендер
 Engine engine(&atoms, &planes); //Движок
 
-//Функция, которую постоянно запускает GLUT
-/*void Idle() {
-    render.pressure = engine.pressure; //Предаем давление в рендер
-    render.bumps = engine.bumps;
-    render.timeLapsed = engine.timeLapsed;
-    //if (engine.calculated) {
-    //    render.distribution = engine.distribution;
-    //}
-    render.draw(); //Отрисовываем
-}*/
-
-//Отрисовка
-//void Display() {
-//    render.draw();
-//}
-
-//Запуск GLUT
-//void InitGlut(int argc, char *argv[]) {
-//    glutInit(&argc, argv);
-//    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
-//    glutInitWindowSize(800, 800);
-//    glutInitWindowPosition(100, 200);
-//    glutCreateWindow("Physics");
-//    glutDisplayFunc(Display);
-//    glutIdleFunc(Idle);
-//    //glutReshapeFunc(WindowReshape);
-//    glClearColor(0.0, 0.0, 0.0, 1.0);
-//    glMatrixMode(GL_PROJECTION);
-//}
 
 void setVexel(double size, double speed = 0, bool piston = false) {
     size /= 2;
@@ -133,7 +103,7 @@ void setVexel(double size, double speed = 0, bool piston = false) {
 }
 
 //Генерируем объекты
-void InitializeObjects(size_t size) {
+void InitializeObjects(size_t size, const std::string& mode = "constant") {
     
     double vexel_size = 1; // Cорона куба
     setVexel(vexel_size);
@@ -148,26 +118,22 @@ void InitializeObjects(size_t size) {
         p.y = 0;
         a.setCoor(p);
         a.prevPoint = p;
-        a.v.x = rand() % maximumSpeed + 1;
-        if (rand() % 2) {
-            a.v.x *= -1;
-        }
-        a.v.y = rand() % maximumSpeed + 1;
-        if (rand() % 2) {
-            a.v.y *= -1;
+        if (mode == "constant") {
+            int direction = rand() % 3;
+            if (direction == 0) {
+                a.v.x = maximumSpeed;
+            } else if (direction == 1) {
+                a.v.y = maximumSpeed;
+            } else {
+                a.v.z = maximumSpeed;
+            }
         }
 
-        a.v.z = rand() % maximumSpeed + 1;
-        if (rand() % 2) {
-            a.v.z *= -1;
-        }
-        //a.v.x /= 100;
-        //a.v.y /= 100;
         // a.a.z = -9.8;
         atoms.push_back(a);
     }
 }
-//Стартуем
+
 void startThread() {
     engine.startEngine();
 }
@@ -176,14 +142,6 @@ int main(int argc, char *argv[]) {
     srand(4);
     maximumSpeed = atoi(argv[2]);
     InitializeObjects(atoi(argv[1])); //Создаем объекты
-//    _window.width = 800;
-//    _window.height = 800;
-//    InitGlut(argc, argv);
-//
-//    std::thread thread(startThread); //Стартуем поток движка
-//    thread.detach();
-//    glutMainLoop();
-
     startThread();
     return 0;
 }

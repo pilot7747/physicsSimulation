@@ -175,18 +175,6 @@ d_8 atom::z() const {
     return point.z;
 }
 
-d_8 atom::v_x() const {
-    return (point - prevPoint).x / dt;
-}
-
-d_8 atom::v_y() const {
-    return (point - prevPoint).y / dt;
-}
-
-d_8 atom::v_z() const {
-    return (point - prevPoint).z / dt;
-}
-
 d_8 atom::a_x() const {
     return 0.0;
 }
