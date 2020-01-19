@@ -69,7 +69,7 @@ ss = np.arange(1,nfr,0.5)
 i = 0
 
 
-fig = plt.figure(figsize=(16, 16), dpi=150)
+fig = plt.figure(figsize=(14, 14), dpi=150)
 ax = fig.add_subplot(221, projection='3d')
 sct, = ax.plot([], [], [], "o", markersize=2)
 
