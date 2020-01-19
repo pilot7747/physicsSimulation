@@ -107,12 +107,12 @@ def update(ifrm, last_frm):
     timeline = np.linspace(0, float(ifrm + 1) / 100, ifrm + 1)
     pres_plt.set_data(timeline, ps[0: ifrm + 1])
     ax3.set_xlim(0, float(ifrm + 1) / 100)
-    ax3.set_ylim(np.mean(ps[0: ifrm + 1]) / 2, np.mean(ps[0: ifrm + 1]) + np.mean(ps[0: ifrm + 1]) / 2)
+    ax3.set_ylim(np.nanmean(ps[0: ifrm + 1]) / 2, np.nanmean(ps[0: ifrm + 1]) + np.nanmean(ps[0: ifrm + 1]) / 2)
     ax3.set_title('Давление: {} Па'.format(str(ps[ifrm])))
 
     tmp_plt.set_data(timeline, ts[0: ifrm + 1])
     ax4.set_xlim(0, float(ifrm + 1) / 100)
-    ax4.set_ylim(np.mean(ts[0: ifrm + 1]) / 2, np.mean(ts[0: ifrm + 1]) + np.mean(ts[0: ifrm + 1]) / 2)
+    ax4.set_ylim(np.nanmean(ts[0: ifrm + 1]) / 2, np.nanmean(ts[0: ifrm + 1]) + np.nanmean(ts[0: ifrm + 1]) / 2)
     ax4.set_title('Температура: {}K'.format(str(ts[ifrm])))
 
 
