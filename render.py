@@ -70,7 +70,6 @@ bs = []
 ss = np.arange(1,nfr,0.5)
 i = 0
 for s in tqdm(ss):
-    #print(i)
     i += 1
     bumps, pressure = step()
     xs.append(np.copy(X))

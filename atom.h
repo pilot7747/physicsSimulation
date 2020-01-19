@@ -211,7 +211,7 @@ void atom::setCoor(const Point &p) { //Установить координаты
 }
 
 std::ostream& operator<<(std::ostream& out, const atom& c) {
-    out << c.x() << std::endl << c.y() << std::endl << c.z() << std::endl << c.v_x() << std::endl << c.v_y() << std::endl << c.v_z() << std::endl << c.a_x() << std::endl << c.a_y() << std::endl << c.a_z() << std::endl;
+    out << c.x() << std::endl << c.y() << std::endl << c.z() << std::endl << c.v.x << std::endl << c.v.y << std::endl << c.v.z << std::endl << c.a_x() << std::endl << c.a_y() << std::endl << c.a_z() << std::endl;
     return out;
 }
 

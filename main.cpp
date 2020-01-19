@@ -136,7 +136,6 @@ void setVexel(double size, double speed = 0, bool piston = false) {
 void InitializeObjects(size_t size) {
     
     double vexel_size = 1; // Cорона куба
-    
     setVexel(vexel_size);
     
     std::default_random_engine generator;
@@ -145,10 +144,6 @@ void InitializeObjects(size_t size) {
     //Генерим молекулы
     for (int i = 0; i < size; ++i) {
         atom a;
-        /*Point p = point((rand() % maxX) - 240, (rand() % maxY) - 240, (rand() % maxZ) - 240);
-        p.x /= 500.0;
-        p.y /= 500.0;
-        p.z /= 500.0;*/
         Point p = point(distribution(generator), distribution(generator), distribution(generator));
         p.y = 0;
         a.setCoor(p);
