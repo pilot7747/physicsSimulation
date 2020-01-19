@@ -17,6 +17,7 @@ parser.add_argument('--engine', required=True)
 parser.add_argument('--output', default='movie.mp4')
 parser.add_argument('--speed', default=300)
 parser.add_argument('--duration', default=60, type=int)
+parser.add_argument('--bitrate', default=20000, type=int)
 
 args = parser.parse_args()
 
@@ -60,28 +61,12 @@ def step():
 
 nfr = args.duration * 50 # Number of frames
 fps = 100 # Frame per sec
-xs = []
-ys = []
-zs = []
-vs = []
+
 ps = []
 bs = []
-
+ts = []
 ss = np.arange(1,nfr,0.5)
 i = 0
-for s in tqdm(ss):
-    i += 1
-    bumps, pressure = step()
-    xs.append(np.copy(X))
-    ys.append(np.copy(Y))
-    zs.append(np.copy(Z))
-    vs.append(np.copy(V))
-    bs.append(bumps)
-    ps.append(pressure)
-
-ts = np.zeros(len(vs))
-for i in range(len(vs)):
-    ts[i] = (np.nanmean(vs[i] ** 2) * mass_of_molecule / 3.0) / k
 
 
 fig = plt.figure(figsize=(16, 16), dpi=150)
@@ -99,27 +84,36 @@ tmp_plt, = ax4.plot([], [])
 
 progress = tqdm(total=nfr * 2 - 3)
 
-def update(ifrm, xa, ya, za, va, ba, pa, ta):
+last_frm = [-1, ]
+
+def update(ifrm, last_frm):
+    if ifrm > last_frm[0]:
+        bumps, pressure = step()
+        bs.append(bumps)
+        ps.append(pressure)
+        temp = (np.nanmean(V ** 2) * mass_of_molecule / 3.0) / k
+        ts.append(temp)
+        last_frm[0] += 1
     progress.n = ifrm
     progress.refresh()
-    sct.set_data(xa[ifrm], ya[ifrm])
-    sct.set_3d_properties(za[ifrm])
-    ax.set_title('{} столкновений'.format(ba[ifrm]))
+    sct.set_data(X, Y)
+    sct.set_3d_properties(Z)
+    ax.set_title('{} столкновений'.format(bs[ifrm]))
 
     ax2.clear()
-    ax2.hist(va[ifrm], density=True, bins=np.linspace(0, 1.5 * float(args.speed), num=30), alpha=0.75)
-    ax2.set_title('Среднеквадратичная скорость: {} м/с'.format(str(round(np.sqrt(np.nanmean(va[ifrm] ** 2)), 2))))
+    ax2.hist(V, density=True, bins=np.linspace(0, 1.5 * float(args.speed), num=30), alpha=0.75)
+    ax2.set_title('Среднеквадратичная скорость: {} м/с'.format(str(round(np.sqrt(np.nanmean(V ** 2)), 2))))
 
     timeline = np.linspace(0, float(ifrm + 1) / 100, ifrm + 1)
-    pres_plt.set_data(timeline, pa[0: ifrm + 1])
+    pres_plt.set_data(timeline, ps[0: ifrm + 1])
     ax3.set_xlim(0, float(ifrm + 1) / 100)
-    ax3.set_ylim(np.mean(pa[0: ifrm + 1]) / 2, np.mean(pa[0: ifrm + 1]) + np.mean(pa[0: ifrm + 1]) / 2)
-    ax3.set_title('Давление: {} Па'.format(str(pa[ifrm])))
+    ax3.set_ylim(np.mean(ps[0: ifrm + 1]) / 2, np.mean(ps[0: ifrm + 1]) + np.mean(ps[0: ifrm + 1]) / 2)
+    ax3.set_title('Давление: {} Па'.format(str(ps[ifrm])))
 
-    tmp_plt.set_data(timeline, ta[0: ifrm + 1])
+    tmp_plt.set_data(timeline, ts[0: ifrm + 1])
     ax4.set_xlim(0, float(ifrm + 1) / 100)
-    ax4.set_ylim(np.mean(ta[0: ifrm + 1]) / 2, np.mean(ta[0: ifrm + 1]) + np.mean(ta[0: ifrm + 1]) / 2)
-    ax4.set_title('Температура: {}K'.format(str(ta[ifrm])))
+    ax4.set_ylim(np.mean(ts[0: ifrm + 1]) / 2, np.mean(ts[0: ifrm + 1]) + np.mean(ts[0: ifrm + 1]) / 2)
+    ax4.set_title('Температура: {}K'.format(str(ts[ifrm])))
 
 
 ax.set_xlim(-0.5, 0.5)
@@ -129,9 +123,9 @@ ax3.set_xlabel('Время, с')
 ax4.set_xlabel('Время, с')
 ax3.set_ylabel('Давление, Па')
 ax4.set_ylabel('Температура, К')
-ani = animation.FuncAnimation(fig, update, nfr * 2 - 3, fargs=(xs, ys, zs, vs, bs, ps, ts), interval=1000/fps)
+ani = animation.FuncAnimation(fig, update, nfr * 2 - 3, fargs=(last_frm,), interval=1000/fps)
 
 
-writer = FFMpegWriter(fps=fps, metadata=dict(artist='Me'), bitrate=20000)
+writer = FFMpegWriter(fps=fps, metadata=dict(artist='nature'), bitrate=args.bitrate)
 ani.save(args.output, writer=writer)
 progress.close()
