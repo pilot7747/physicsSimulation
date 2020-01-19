@@ -31,23 +31,6 @@ bool diffSignes(const d_8& a, const d_8& b) { // Функция, которая 
     return false;
 }
 
-bool intersects(const border& plane, const Point& a, const Point& b) { //Проверка пересечения отрезка и плоскости (переделать!)
-    long double x, y, z;
-    if (plane.type == borderType::horizontal) {
-        z = plane.p1.z;
-        return diffSignes(a.z - z, b.z - z);
-    }
-    if (plane.type == borderType::vertical) {
-        x = plane.p1.x;
-        return diffSignes(a.x - x, b.x - x);
-    }
-    if (plane.type == borderType::ortogonal) {
-        y = plane.p1.y;
-        return diffSignes(a.y - y, b.y - y);
-    }
-    return false;
-}
-
 
 class Engine { //Движок
 private:
@@ -93,29 +76,7 @@ private:
         return bumps;
     }
 
-    void mirror(atom &a, const border &plane) { // Отразить относительно плоскости (можно, наверное, переделать)
-        if (plane.type == borderType::horizontal) {
-            a.point.z += (plane.p1.z - a.point.z) * 2;
-            a.v.z *= -1;
-            tmpPres.store(tmpPres.load() + (std::abs(a.v.z) * 2 / dt) * massOfmolecule); //Изменение имульса
-        }
-        if (plane.type == borderType::vertical) {
-            a.point.x += (plane.p1.x - a.point.x) * 2;
-            a.v.x *= -1;
-            tmpPres.store(tmpPres.load() + (std::abs(a.v.x) * 2 / dt) * massOfmolecule); //Изменение имульса
-        }
-        if (plane.type == borderType::ortogonal) {
-            a.point.y += (plane.p1.y - a.point.y) * 2;
-            a.v.y *= -1;
-            tmpPres.store(tmpPres.load() + (std::abs(a.v.y) * 2 / dt) * massOfmolecule); //Изменение имульса
-        }
-        vec v = plane.v;
-        v *= 1;
-        a.v += v;
-    }
-
     void ProcessBump(atom& a) {
-
         const border& left = (*planes)[0];
         const border& right = (*planes)[1];
         const border& top = (*planes)[2];
@@ -140,63 +101,6 @@ private:
             a.v.y *= -1;
         }
         tmpPres.store(tmpPres.load() + (std::abs(a.v.y) * 2 / dt) * massOfmolecule * bmps);
-        /*
-        // left and right
-
-        const long double size_x = right.p1.x - left.p1.x;
-        if (a.point.x >= right.p1.x) {
-            auto bumps_num = static_cast<long long>(std::abs(a.point.x - left.p1.x) / size_x);
-            a.point.x -= size_x * bumps_num;
-            a.point.x = right.p1.x - a.point.x;
-            if (bumps_num % 2 == 1) {
-                a.v.x *= -1;
-            }
-        } else if (a.point.x <= left.p1.x) {
-            auto bumps_num = static_cast<long long>(std::abs(a.point.x - right.p1.x) / size_x);
-            a.point.x += size_x * bumps_num;
-            a.point.x += left.p1.x;
-            if (bumps_num % 2 == 1) {
-                a.v.x *= -1;
-            }
-        }
-
-        // top and bottom
-
-        const long double size_z = top.p1.z - bottom.p1.z;
-        if (a.point.z >= top.p1.z) {
-            auto bumps_num = static_cast<long long>(std::abs(a.point.z - bottom.p1.z) / size_z);
-            a.point.z -= size_z * bumps_num;
-            a.point.z = top.p1.z - a.point.z;
-            if (bumps_num % 2 == 1) {
-                a.v.z *= -1;
-            }
-        } else if (a.point.z <= bottom.p1.z) {
-            auto bumps_num = static_cast<long long>(std::abs(a.point.z - top.p1.z) / size_z);
-            a.point.z += size_z * bumps_num;
-            a.point.z += bottom.p1.z;
-            if (bumps_num % 2 == 1) {
-                a.v.z *= -1;
-            }
-        }
-
-        // ftont and background
-
-        const long double size_y = front.p1.y - background.p1.y;
-        if (a.point.y >= front.p1.y) {
-            auto bumps_num = static_cast<long long>(std::abs(a.point.y - background.p1.y) / size_y);
-            a.point.y -= size_y * bumps_num;
-            a.point.y = front.p1.y - a.point.y;
-            if (bumps_num % 2 == 1) {
-                a.v.y *= -1;
-            }
-        } else if (a.point.y <= background.p1.y) {
-            auto bumps_num = static_cast<long long>(std::abs(a.point.y - front.p1.y) / size_y);
-            a.point.y += size_z * bumps_num;
-            a.point.y += bottom.p1.y;
-            if (bumps_num % 2 == 1) {
-                a.v.y *= -1;
-            }
-        }*/
     }
 
 
@@ -284,12 +188,7 @@ void Engine::changeCoords() {
 
 void Engine::doIntersectionsOneThread(size_t left, size_t right) { // Обработать пересечение перемещения молекулы со стенкой сосуда
     for (size_t i = left; i < right; ++i) {
-        //for (auto &plane : *planes) {
-            //if (intersects(plane, getCenter((*planes)[0], (*planes)[1], (*planes)[2], (*planes)[3]), (*atoms)[i].point)) { //Для каждой пары (молекула, стенка сосуда) проверяем пересекает ли отрезок с концами в центре сосуда и текущем положении молекулы стенку сосуда
-            //    mirror((*atoms)[i], plane); // Если да, то отражаем молекулу от стенки
-            //}
-            ProcessBump((*atoms)[i]);
-        //}
+        ProcessBump((*atoms)[i]);
     }
 }
 
