@@ -5,6 +5,7 @@ import argparse
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import scipy.stats as sps
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.animation as animation
 import subprocess
@@ -20,6 +21,9 @@ parser.add_argument('--duration', default=60, type=int)
 parser.add_argument('--bitrate', default=20000, type=int)
 
 args = parser.parse_args()
+
+def maxwell_pdf(x, temperature, mass_of_molecule, k=0.0000000000000000000000138065):
+    return 4 * np.pi * (x ** 2) * ((mass_of_molecule / (2 * np.pi * k * temperature)) ** 1.5) * np.exp(-mass_of_molecule * (x ** 2) / (2 * k * temperature))
 
 def run_simulation():
     ps = subprocess.Popen([args.engine,  args.particles, str(int(float(args.speed)))], stdout=subprocess.PIPE)
@@ -75,6 +79,7 @@ sct, = ax.plot([], [], [], "o", markersize=2)
 
 ax2 = fig.add_subplot(222)
 hst = ax2.hist([], density=True)
+#maxwell_plot, = ax2.plot([], [])
 
 ax3 = fig.add_subplot(223)
 pres_plt, = ax3.plot([], [])
@@ -101,13 +106,18 @@ def update(ifrm, last_frm):
     ax.set_title('{} столкновений'.format(bs[ifrm]))
 
     ax2.clear()
+    x = np.linspace(0, 2 * float(args.speed), 200)
     ax2.hist(V, density=True, bins=np.linspace(0, 2 * float(args.speed), num=30), alpha=0.75)
+    ax2.plot(x, maxwell_pdf(x, ts[ifrm], mass_of_molecule), label='Теоретическое распределение')
     ax2.set_title('Среднеквадратичная скорость: {} м/с'.format(str(round(np.sqrt(np.nanmean(V ** 2)), 2))))
+    ax2.legend()
 
+    ax3.clear()
     timeline = np.linspace(0, float(ifrm + 1) / 100, ifrm + 1)
-    pres_plt.set_data(timeline, ps[0: ifrm + 1])
-    ax3.set_xlim(0, float(ifrm + 1) / 100)
-    ax3.set_ylim(np.nanmean(ps[0: ifrm + 1]) / 2, np.nanmean(ps[0: ifrm + 1]) + np.nanmean(ps[0: ifrm + 1]) / 2)
+    loc, scale = sps.norm.fit(ps)
+    ax3.hist(ps, density=True, bins=np.linspace(loc - 3 * scale, loc + 3 * scale, num=20), alpha=0.75)
+    x = np.linspace(loc - 3 * scale, loc + 3 * scale, 100)
+    ax3.plot(x, sps.norm.pdf(x, loc=loc, scale=scale))
     ax3.set_title('Давление: {} Па'.format(str(ps[ifrm])))
 
     tmp_plt.set_data(timeline, ts[0: ifrm + 1])
