@@ -73,7 +73,7 @@ ss = np.arange(1,nfr,0.5)
 i = 0
 
 
-fig = plt.figure(figsize=(14, 14), dpi=150)
+fig = plt.figure(figsize=(14, 14), dpi=100)
 ax = fig.add_subplot(221, projection='3d')
 sct, = ax.plot([], [], [], "o", markersize=2)
 
@@ -122,7 +122,8 @@ def update(ifrm, last_frm):
 
     tmp_plt.set_data(timeline, ts[0: ifrm + 1])
     ax4.set_xlim(0, float(ifrm + 1) / 100)
-    ax4.set_ylim(np.nanmean(ts[0: ifrm + 1]) / 2, np.nanmean(ts[0: ifrm + 1]) + np.nanmean(ts[0: ifrm + 1]) / 2)
+    tsmean = np.nanmean(ts[0: ifrm + 1])
+    ax4.set_ylim(tsmean / 2, tsmean + tsmean / 2)
     ax4.set_title('Температура: {}K'.format(str(ts[ifrm])))
 
 
@@ -139,3 +140,15 @@ ani = animation.FuncAnimation(fig, update, nfr * 2 - 3, fargs=(last_frm,), inter
 writer = FFMpegWriter(fps=fps, metadata=dict(artist='nature'), bitrate=args.bitrate)
 ani.save(args.output, writer=writer)
 progress.close()
+with open('v_dist.csv', 'w', newline='') as csvfile:
+    np.savetxt("v_dist.csv", V, delimiter=",")
+with open('x_dist.csv', 'w', newline='') as csvfile:
+    np.savetxt("x_dist.csv", X, delimiter=",")
+with open('y_dist.csv', 'w', newline='') as csvfile:
+    np.savetxt("y_dist.csv", Y, delimiter=",")
+with open('z_dist.csv', 'w', newline='') as csvfile:
+    np.savetxt("z_dist.csv", Z, delimiter=",")
+with open('p_dist.csv', 'w', newline='') as csvfile:
+    np.savetxt("p_dist.csv", ps, delimiter=",")
+with open('t_dist.csv', 'w', newline='') as csvfile:
+    np.savetxt("t_dist.csv", ts, delimiter=",")

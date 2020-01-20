@@ -33,18 +33,15 @@ bool diffSignes(const d_8& a, const d_8& b) { // Функция, которая 
     return (a <= 0 && b >= 0) || (a >= 0 && b <= 0);
 }
 
-
 class Engine { //Движок
 private:
     std::vector<atom>* atoms; //Указатель на массив молекул
     std::vector<border>* planes; //Указатель на массив стенок
     void changeCoords(); //Пересчитать координаты
     void doIntersections();
-    void doIntersectionsOneThread(size_t left, size_t right); //Обработать удары об стенки
-    void doBumpOneThread(size_t left, size_t right);
-    void doBumps(std::uniform_real_distribution<long double>& dist1, std::uniform_real_distribution<long double>& dist2, std::default_random_engine& generator); //Обработать столкновения
+    void doBumps(); //Обработать столкновения
     void movePlanes(); //Передвинуть стенки сосуда
-    void atomBumping(atom& a1, atom& a2, std::uniform_real_distribution<long double>& dist1, std::default_random_engine& generator); //Столкновение молекул
+    void atomBumping(atom& a1, atom& a2); //Столкновение молекул
     constexpr static unsigned long long max_speed = 1;
 
     static int ProcessBumpImpl(long double& x, long double left, long double right) {
@@ -103,8 +100,6 @@ private:
         tmpPres.store(NanClip(tmpPres.load() / totalArea + (std::abs(a.v.y) * 2 / dt) / totalArea * massOfmolecule * bmps));
     }
 
-
-
     void PrintAtoms() {
         for (auto&& atom : *atoms) {
             std::cout << atom;
@@ -133,7 +128,9 @@ inline vec Rotate(const vec& dir, const vec& x, const long double& a)
     return nx + y;
 }
 
-void Engine::atomBumping(atom& a1, atom& a2, std::uniform_real_distribution<long double>& dist1, std::default_random_engine& generator) {
+void Engine::atomBumping(atom& a1, atom& a2) {
+    std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
+    std::default_random_engine generator;
     if (a1.v.equal(a2.v)) { //Если скорости молекул почти сонаправлены, то считаем, что они все-таки не сталкиваются
         --bumps;
         return;
@@ -184,52 +181,27 @@ void Engine::changeCoords() {
     }
 }
 
-void Engine::doIntersectionsOneThread(size_t left, size_t right) { // Обработать пересечение перемещения молекулы со стенкой сосуда
-    for (size_t i = left; i < right; ++i) {
-        ProcessBump((*atoms)[i]);
-    }
-}
-
 void Engine::doIntersections() { // Обработать пересечение перемещения молекулы со стенкой сосуда
-    size_t blocks_size = atoms->size() / concurentThreadsSupported;
-    size_t last_block = atoms->size() - (concurentThreadsSupported - 1) * (blocks_size);
-    std::vector<std::thread> threads;
-    for (size_t i = 0; i < concurentThreadsSupported - 1; ++i) {
-
-        threads.emplace_back(std::thread(&Engine::doIntersectionsOneThread, this, i * blocks_size, (i + 1) * blocks_size));
-    }
-    threads.emplace_back(std::thread(&Engine::doIntersectionsOneThread, this, (concurentThreadsSupported - 1) * blocks_size, (concurentThreadsSupported - 1) * blocks_size + last_block));
-
-    for (auto&& t : threads) {
-        t.join();
-    }
-}
-
-void Engine::doBumpOneThread(size_t left, size_t right) {
-    std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
-    std::default_random_engine generator;
-    for (int i = left; i < right; ++i) {
-        for (int j = i + 1; j < atoms->size(); ++j) {
-            if (i != j && (*atoms)[i].getDistance((*atoms)[j]) < 0.001) { //Если расстояние меньше 1мм, то сталкиваем их
-                ++bumps; //Увеличиваем счетчик столкновений
-                atomBumping((*atoms)[i], (*atoms)[j], dist1, generator); //Запускаем функцию выше
-            }
-        }
+    std::vector<atom>& atoms_cp = *atoms;
+    #pragma omp target teams distribute parallel for map(from:atoms_cp)
+    for (size_t i = 0; i < atoms_cp.size(); ++i) {
+        ProcessBump(atoms_cp[i]);
     }
 }
 
 //Перебираем все пары молекул
-void Engine::doBumps(std::uniform_real_distribution<long double>& dist1, std::uniform_real_distribution<long double>& dist2, std::default_random_engine& generator) {
-    size_t blocks_size = atoms->size() / concurentThreadsSupported;
-    size_t last_block = atoms->size() - (concurentThreadsSupported - 1) * (blocks_size);
-    std::vector<std::thread> threads;
-    for (size_t i = 0; i < concurentThreadsSupported - 1; ++i) {
-        threads.emplace_back(std::thread(&Engine::doBumpOneThread, this, i * blocks_size, (i + 1) * blocks_size));
-    }
-    threads.emplace_back(std::thread(&Engine::doBumpOneThread, this, (concurentThreadsSupported - 1) * blocks_size, (concurentThreadsSupported - 1) * blocks_size + last_block));
-
-    for (auto&& t : threads) {
-        t.join();
+void Engine::doBumps() {
+    std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
+    std::default_random_engine generator;
+    auto& atoms_cp = *atoms;
+    #pragma omp target teams distribute parallel for map(from:atoms_cp)
+    for (int i = 0; i < atoms_cp.size(); ++i) {
+        for (int j = i + 1; j < atoms_cp.size(); ++j) {
+            if (i != j && atoms_cp[i].getDistance(atoms_cp[j]) < 0.001) { //Если расстояние меньше 1мм, то сталкиваем их
+                ++bumps; //Увеличиваем счетчик столкновений
+                atomBumping(atoms_cp[i], atoms_cp[j]); //Запускаем функцию выше
+            }
+        }
     }
 }
 
@@ -260,6 +232,7 @@ void Engine::movePlanes() {
 }
 
 void Engine::startEngine() { //Эта функция запускается в отдельном потоке и постоянно обрабатывает следующее состояние системы через время dt
+    std::ios_base::sync_with_stdio(false);
     std::cout << atoms->size() << std::endl;
     std::cout << massOfmolecule << std::endl;
     std::cout << k << std::endl;
@@ -274,7 +247,7 @@ void Engine::startEngine() { //Эта функция запускается в �
         
 
         doIntersections();
-        doBumps(dist1, dist2, generator); //Обрабатываем столкновения молекул
+        doBumps(); //Обрабатываем столкновения молекул
 
         pressure = tmpPres.load(); // totalArea; //Получаем давление, деля силу на площадь
 
