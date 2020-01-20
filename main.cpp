@@ -115,7 +115,6 @@ void InitializeObjects(size_t size, const std::string& mode = "constant") {
     for (int i = 0; i < size; ++i) {
         atom a;
         Point p = point(distribution(generator), distribution(generator), distribution(generator));
-        p.y = 0;
         a.setCoor(p);
         a.prevPoint = p;
         if (mode == "constant") {
