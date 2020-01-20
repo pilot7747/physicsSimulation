@@ -268,7 +268,7 @@ void Engine::startEngine() { //Эта функция запускается в �
     std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
     std::uniform_real_distribution<long double> dist2(-1, 1);
     while (true) {
-        //PrintAtoms();
+        PrintAtoms();
         movePlanes();
         changeCoords();// Пересчитываем координаты
         
