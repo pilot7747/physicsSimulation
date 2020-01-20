@@ -57,7 +57,6 @@ def step():
         V[i] = np.sqrt(v_x ** 2 + v_y ** 2 + v_z ** 2)
     bumps = next(sim_res)
     pressure = next(sim_res)
-    print(pressure)
     return bumps, pressure
 
 nfr = args.duration * 50 # Number of frames
