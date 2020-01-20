@@ -102,14 +102,29 @@ void setVexel(double size, double speed = 0, bool piston = false) {
     totalArea = size * size * 6;
 }
 
+vec SphereUniform() {
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::mt19937 generator (seed);
+    std::uniform_real_distribution<double> uniform01(0.0, 1.0);
+
+    vec res;
+    double theta = 2 * M_PI * uniform01(generator);
+    double phi = acos(1 - 2 * uniform01(generator));
+    res.x = sin(phi) * cos(theta);
+    res.y = sin(phi) * sin(theta);
+    res.z = cos(phi);
+    return res;
+}
+
 //Генерируем объекты
-void InitializeObjects(size_t size, const std::string& mode = "constant") {
+void InitializeObjects(size_t size, const std::string& mode = "constant", bool gravity=false) {
     
     double vexel_size = 1; // Cорона куба
     setVexel(vexel_size);
     
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distribution(-vexel_size + 0.001, vexel_size - 0.001);
+    std::uniform_real_distribution<double> angle_distribution;
     
     //Генерим молекулы
     for (int i = 0; i < size; ++i) {
@@ -117,18 +132,15 @@ void InitializeObjects(size_t size, const std::string& mode = "constant") {
         Point p = point(distribution(generator), distribution(generator), distribution(generator));
         a.setCoor(p);
         a.prevPoint = p;
+
         if (mode == "constant") {
-            int direction = rand() % 3;
-            if (direction == 0) {
-                a.v.x = maximumSpeed;
-            } else if (direction == 1) {
-                a.v.y = maximumSpeed;
-            } else {
-                a.v.z = maximumSpeed;
-            }
+            a.v = SphereUniform();
+            a.v *= static_cast<long double>(maximumSpeed);
         }
 
-        // a.a.z = -9.8;
+        if (gravity) {
+            a.a.z = -9.8;
+        }
         atoms.push_back(a);
     }
 }
