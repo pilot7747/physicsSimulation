@@ -23,6 +23,10 @@ constexpr int intTimes = 500; //Количество раз, сколько ну
 
 unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
 
+long double NanClip(long double number) {
+    return std::isnan(number) ? 0 : number;
+}
+
 using namespace std::literals;
 
 bool diffSignes(const d_8& a, const d_8& b) { // Функция, которая проверяет разные ли знаки у двух чисел
@@ -84,19 +88,19 @@ private:
         if (bmps % 2 == 1) {
             a.v.x *= -1;
         }
-        tmpPres.store(tmpPres.load() + (std::abs(a.v.x) * 2 / dt) * massOfmolecule * bmps);
+        tmpPres.store(NanClip(tmpPres.load() / totalArea + (std::abs(a.v.x) * 2 / dt) / totalArea * massOfmolecule * bmps));
 
         bmps = ProcessBumpImpl(a.point.z, bottom.p1.z, top.p1.z);
         if (bmps % 2 == 1) {
             a.v.z *= -1;
         }
-        tmpPres.store(tmpPres.load() + (std::abs(a.v.z) * 2 / dt) * massOfmolecule * bmps);
+        tmpPres.store(NanClip(tmpPres.load() / totalArea + (std::abs(a.v.z) * 2 / dt) / totalArea * massOfmolecule * bmps));
 
         bmps = ProcessBumpImpl(a.point.y, background.p1.y, front.p1.y);
         if (bmps % 2 == 1) {
             a.v.y *= -1;
         }
-        tmpPres.store(tmpPres.load() + (std::abs(a.v.y) * 2 / dt) * massOfmolecule * bmps);
+        tmpPres.store(NanClip(tmpPres.load() / totalArea + (std::abs(a.v.y) * 2 / dt) / totalArea * massOfmolecule * bmps));
     }
 
 
@@ -220,7 +224,6 @@ void Engine::doBumps(std::uniform_real_distribution<long double>& dist1, std::un
     size_t last_block = atoms->size() - (concurentThreadsSupported - 1) * (blocks_size);
     std::vector<std::thread> threads;
     for (size_t i = 0; i < concurentThreadsSupported - 1; ++i) {
-
         threads.emplace_back(std::thread(&Engine::doBumpOneThread, this, i * blocks_size, (i + 1) * blocks_size));
     }
     threads.emplace_back(std::thread(&Engine::doBumpOneThread, this, (concurentThreadsSupported - 1) * blocks_size, (concurentThreadsSupported - 1) * blocks_size + last_block));
@@ -265,7 +268,7 @@ void Engine::startEngine() { //Эта функция запускается в �
     std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
     std::uniform_real_distribution<long double> dist2(-1, 1);
     while (true) {
-        PrintAtoms();
+        //PrintAtoms();
         movePlanes();
         changeCoords();// Пересчитываем координаты
         
@@ -273,13 +276,12 @@ void Engine::startEngine() { //Эта функция запускается в �
         doIntersections();
         doBumps(dist1, dist2, generator); //Обрабатываем столкновения молекул
 
-        pressure = tmpPres.load() / totalArea; //Получаем давление, деля силу на площадь
+        pressure = tmpPres.load(); // totalArea; //Получаем давление, деля силу на площадь
 
         std::cout << bumps << std::endl;
         std::cout << pressure << std::endl;
 
         tmpPres.store(0); //Сбрасываем давление
-        //std::this_thread::sleep_for(std::chrono::milliseconds(dt_int)); //Ждем dt
         timeLapsed += dt;
     }
 }
