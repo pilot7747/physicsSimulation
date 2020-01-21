@@ -91,6 +91,16 @@ progress = tqdm(total=nfr * 2 - 3)
 
 last_frm = [-1, ]
 
+def last_second_mean(data, frames=100):
+    n = len(data)
+    if n % frames == 0 and n >= frames:
+        return np.nanmean(data[n - frames: n])
+    else:
+        return None
+    
+pressure_by_seconds = []
+t_by_sec = []
+
 def update(ifrm, last_frm):
     if ifrm > last_frm[0]:
         bumps, pressure = step()
@@ -112,19 +122,26 @@ def update(ifrm, last_frm):
     ax2.set_title('Среднеквадратичная скорость: {} м/с'.format(str(round(np.sqrt(np.nanmean(V ** 2)), 2))))
     ax2.legend()
 
-    ax3.clear()
-    timeline = np.linspace(0, float(ifrm + 1) / 100, ifrm + 1)
-    loc, scale = sps.norm.fit(ps)
-    ax3.hist(ps, density=True, bins=np.linspace(loc - 3 * scale, loc + 3 * scale, num=20), alpha=0.75)
-    x = np.linspace(loc - 3 * scale, loc + 3 * scale, 100)
-    ax3.plot(x, sps.norm.pdf(x, loc=loc, scale=scale))
-    ax3.set_title('Давление: {} Па'.format(str(ps[ifrm])))
+    new_pres = last_second_mean(ps)
+    if new_pres is not None:
+        pressure_by_seconds.append(new_pres)
 
-    tmp_plt.set_data(timeline, ts[0: ifrm + 1])
-    ax4.set_xlim(0, float(ifrm + 1) / 100)
-    tsmean = np.nanmean(ts[0: ifrm + 1])
-    ax4.set_ylim(tsmean / 2, tsmean + tsmean / 2)
-    ax4.set_title('Температура: {}K'.format(str(ts[ifrm])))
+    pres_plt.set_data(np.arange(1, len(pressure_by_seconds) + 1), pressure_by_seconds)
+    if len(pressure_by_seconds) > 0:
+        ax3.set_ylim(pressure_by_seconds[-1] / 2, pressure_by_seconds[-1] + pressure_by_seconds[-1] / 2)
+        ax3.set_xlim(1, len(pressure_by_seconds))
+        ax3.set_title('Давление: {} Па'.format(str(pressure_by_seconds[-1])))
+
+    timeline = np.linspace(0, float(ifrm + 1) / 100, ifrm + 1)
+
+    new_t = last_second_mean(ts)
+    if new_t is not None:
+        t_by_sec.append(new_t)
+    tmp_plt.set_data(np.arange(1, len(t_by_sec) + 1), t_by_sec)
+    if len(t_by_sec) > 0:
+        ax4.set_ylim(t_by_sec[-1] / 2, t_by_sec[-1] + t_by_sec[-1] / 2)
+        ax4.set_xlim(1, len(t_by_sec))
+        ax4.set_title('Температура: {}K'.format(str(t_by_sec[-1])))
 
 
 ax.set_xlim(-0.5, 0.5)
