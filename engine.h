@@ -19,6 +19,9 @@
 #include <random>
 #include <iomanip>
 
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/beta_distribution.hpp>
+
 constexpr int intTimes = 500; //Количество раз, сколько нужно отработать удары об стенки
 
 unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
@@ -129,12 +132,14 @@ inline vec Rotate(const vec& dir, const vec& x, const long double& a)
 }
 
 void Engine::atomBumping(atom& a1, atom& a2) {
-    std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
-    std::default_random_engine generator;
-    if (a1.v.equal(a2.v)) { //Если скорости молекул почти сонаправлены, то считаем, что они все-таки не сталкиваются
-        --bumps;
-        return;
-    }
+    //std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
+    //std::default_random_engine generator;
+    boost::random::mt19937 generator;
+    boost::random::beta_distribution dist1(7.0, 7.0);
+    //if (a1.v.equal(a2.v)) { //Если скорости молекул почти сонаправлены, то считаем, что они все-таки не сталкиваются
+    //    --bumps;
+    //    return;
+    //}
     int i = 0;
     while (true) {
         if (i > 10000000) {
@@ -145,8 +150,10 @@ void Engine::atomBumping(atom& a1, atom& a2) {
         vec v2 = a2.v; //Второй молекулы
         vec sum = v1 + v2; //Суммарный импульс (масса молекул одинакова, поэтому здесь и дальше мы ее не учитываем
         d_8 energy = v1 * v1 + v2 * v2; //Удвоенная кинетическая энергия
-        auto a = dist1(generator);
-
+        auto a = dist1(generator) * M_PI;
+        if (rand() % 2 == 0) {
+            a = 2 * M_PI - a;
+        }
         vec z = v1.cross(v2);
         z = z.norm();
         vec dobavka = v2;
@@ -197,7 +204,7 @@ void Engine::doBumps() {
     #pragma omp target teams distribute parallel for map(from:atoms_cp)
     for (int i = 0; i < atoms_cp.size(); ++i) {
         for (int j = i + 1; j < atoms_cp.size(); ++j) {
-            if (i != j && atoms_cp[i].getDistance(atoms_cp[j]) < 0.001) { //Если расстояние меньше 1мм, то сталкиваем их
+            if (i != j && atoms_cp[i].getDistance(atoms_cp[j]) < 0.003) { //Если расстояние меньше 1мм, то сталкиваем их
                 ++bumps; //Увеличиваем счетчик столкновений
                 atomBumping(atoms_cp[i], atoms_cp[j]); //Запускаем функцию выше
             }

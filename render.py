@@ -128,7 +128,8 @@ def update(ifrm, last_frm):
 
     pres_plt.set_data(np.arange(1, len(pressure_by_seconds) + 1), pressure_by_seconds)
     if len(pressure_by_seconds) > 0:
-        ax3.set_ylim(pressure_by_seconds[-1] / 2, pressure_by_seconds[-1] + pressure_by_seconds[-1] / 2)
+        pbs_mean = np.mean(pressure_by_seconds)
+        ax3.set_ylim(pbs_mean / 2, pbs_mean + pbs_mean / 2)
         ax3.set_xlim(1, len(pressure_by_seconds))
         ax3.set_title('Давление: {} Па'.format(str(pressure_by_seconds[-1])))
 
