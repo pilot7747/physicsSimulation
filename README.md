@@ -13,6 +13,10 @@ $\Delta S = \nu R ln\left(\dfrac{V_2}{V_1}\right)$
   
 3. Среднее число ударов молекул о стенку  
   
-[Кириченко(ср.число ударов о стенку)](https://drive.google.com/open?id=16bpYY2K-9qyySOx-34s1-wCrnWJ0aV9j)  
-  
-## Лекции про стат. физику
+[Кириченко(ср.число ударов о стенку)](https://drive.google.com/open?id=16bpYY2K-9qyySOx-34s1-wCrnWJ0aV9j)   
+
+## Лекции
+
+[Распределение Максвелла](https://www.youtube.com/watch?v=LK90eR7M0f4) - хз, мне не понравилось там что-то про распределние Гиббса.
+
+[Статья. Распределение Максвелла](http://portal.tpu.ru:7777/departments/kafedra/tief/method_work/method_work2/lab1/LabsMechMolecFiles/ModT-04.pdf)
