@@ -19,8 +19,8 @@
 #include <random>
 #include <iomanip>
 
-#include <boost/random/mersenne_twister.hpp>
-#include <boost/random/beta_distribution.hpp>
+//#include <boost/random/mersenne_twister.hpp>
+//#include <boost/random/beta_distribution.hpp>
 
 constexpr int intTimes = 500; //Количество раз, сколько нужно отработать удары об стенки
 
@@ -212,12 +212,12 @@ void Engine::movePlanes() {
         plane.p2.x += plane.v.x * dt;
         plane.p3.x += plane.v.x * dt;
         plane.p4.x += plane.v.x * dt;
-        
+
         plane.p1.y += plane.v.y * dt;
         plane.p2.y += plane.v.y * dt;
         plane.p3.y += plane.v.y * dt;
         plane.p4.y += plane.v.y * dt;
-        
+
         plane.p1.z += plane.v.z * dt;
         plane.p2.z += plane.v.z * dt;
         plane.p3.z += plane.v.z * dt;
@@ -240,7 +240,7 @@ void Engine::startEngine() { //Эта функция запускается в �
         PrintAtoms();
         movePlanes();
         changeCoords();// Пересчитываем координаты
-        
+
 
         doIntersections();
         doBumps(); //Обрабатываем столкновения молекул
