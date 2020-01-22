@@ -22,7 +22,7 @@
 \documentclass[twoside,twocolumn]{article}
 \usepackage[english, russian]{babel}
 \usepackage{graphicx}
-\graphicspath{{Materials/graphics/}{Materials/}}  % папки с картинками
+\graphicspath{{Materials/graphics/}{Materials/graphs/}{Materials/}}  % папки с картинками
 \usepackage[utf8]{inputenc}
 \usepackage{blindtext} % Package to generate dummy text throughout this template
 \usepackage{xcolor}
@@ -60,6 +60,12 @@
 \fancyfoot{} % Blank out the default footer
 \fancyhead[C]{Моделирование газа$\bullet$ Январь 2020 $\bullet$ МФТИ} % Custom header text
 \fancyfoot[RO,LE]{\thepage} % Custom footer text
+
+\usepackage{geometry} % Простой способ задавать поля
+\geometry{top=25mm}
+\geometry{bottom=30mm}
+\geometry{left=25mm}
+\geometry{right=25mm}
 
 \usepackage{titling} % Customizing the title section
 \usepackage{comment} % Для комментирования
@@ -108,8 +114,9 @@
 %----------------------------------------------------------------------------------------
 
 %  ToDO
-%  1. запустить Spell Checker
-%  2. Разместить ссылку на гитхаб в начале дока
+% 0. Сделать шрифт больше.
+% 1. запустить Spell Checker.
+% 2. Разместить ссылку на гитхаб в начале дока.
 \begin{document}
 
 % Print the title
@@ -238,7 +245,6 @@ F(\upsilon) = \int_0^\infty 4\pi\upsilon^2 \Big( \dfrac{m}{2\pi kT} \Big)^{3/2}\
 
 \textbf{Вывод:}
 Также были построены графики скоростей молекул и распределение проекций скоростей на ось $OX$. Заметим небольшое смещение гистограммы относительно аналитически полученного распределения влево. Это может быть связано с тем, что распределение направлений при столкновении молекул на самом деле не является равномерным. Такая неточность дает небольшую ошибку, но это можно будет учесть в последующих версиях программы.
-
 
 \subsection{Распределение по энергиям в поле силы тяжести}
 
