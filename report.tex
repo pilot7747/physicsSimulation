@@ -1,0 +1,163 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Journal Article
+% LaTeX Template
+% Version 1.4 (15/5/16)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com) with extensive modifications by
+% Vel (vel@LaTeXTemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[twoside,twocolumn]{article}
+\usepackage[english, russian]{babel}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext} % Package to generate dummy text throughout this template 
+
+\usepackage[sc]{mathpazo} % Use the Palatino font
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\linespread{1.05} % Line spacing - Palatino needs more space between lines
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+
+\usepackage[english]{babel} % Language hyphenation and typographical rules
+
+\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+
+\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
+
+\usepackage{enumitem} % Customized lists
+\setlist[itemize]{noitemsep} % Make itemize lists more compact
+
+\usepackage{abstract} % Allows abstract customization
+\renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
+
+\usepackage{titlesec} % Allows customization of titles
+\renewcommand\thesection{\Roman{section}} % Roman numerals for the sections
+\renewcommand\thesubsection{\roman{subsection}} % roman numerals for subsections
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{} % Change the look of the section titles
+
+\usepackage{fancyhdr} % Headers and footers
+\pagestyle{fancy} % All pages have headers and footers
+\fancyhead{} % Blank out the default header
+\fancyfoot{} % Blank out the default footer
+\fancyhead[C]{The Kernel Trick $\bullet$ Декабрь 2019 $\bullet$ МФТИ} % Custom header text
+\fancyfoot[RO,LE]{\thepage} % Custom footer text
+
+\usepackage{titling} % Customizing the title section
+
+\usepackage{hyperref} % For hyperlinks in the PDF
+\usepackage{amssymb,amsmath,amsthm}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Теорема}
+\newtheorem{lemma}{Лемма}
+\newtheorem{proposition}{Утверждение}
+\newtheorem{corollary}{Следствие}
+\theoremstyle{definition}
+\newtheorem{definition}{Определение}
+\newtheorem{notation}{Обозначение}
+\newtheorem{example}{Пример}
+\DeclareMathOperator{\sign}{sign}
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\setlength{\droptitle}{-4\baselineskip} % Move the title up
+
+\pretitle{\begin{center}\Huge\bfseries} % Article title formatting
+\posttitle{\end{center}} % Article title closing formatting
+\title{Компьютерное моделирование идеального газа, распределение Максвелла, флуктуации.} % Article title
+\author{%
+\textsc{Н. В. Павличенко, А. С. Подкидышев} \\[1ex] % Your name
+\normalsize Московский физико-технический институт \\ % Your institution
+\normalsize \href{mailto:pavlichenko.nv@phystech.edu}{pavlichenko.nv@phystech.edu} 
+\href{mailto:pavlichenko.nv@phystech.edu}{podkidishev.as@phystech.edu}% Your email address
+%\and % Uncomment if 2 authors are required, duplicate these 4 lines if more
+%\textsc{Jane Smith}\thanks{Corresponding author} \\[1ex] % Second author's name
+%\normalsize University of Utah \\ % Second author's institution
+%\normalsize \href{mailto:jane@smith.com}{jane@smith.com} % Second author's email address
+}
+\date{\today} % Leave empty to omit a date
+\renewcommand{\maketitlehookd}{%
+\begin{abstract}
+\noindent В данной статье расматривается ...
+\end{abstract}
+}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+% Print the title
+\maketitle
+
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+\section{Введение}
+
+\lettrine[nindent=0em,lines=3]{Л} {инейные методы} использовались с самого зарождения таких наук как статистика и машинное обучение.
+ Они действительно хороши с теоретической точки зрения: для них доказано много теорем, найдены
+довереительные интервалы для отклика в различных моделях и, более того, существует аналитическое решение для нахождения
+оптимальных параметров алгоритма. Однако они имеют существенные проблемы: они очень плохо работают при нелинейных
+зависимостях в данных. Собственно, хотелось бы иметь метод, который позволял бы использовать все достоинства линейных моделей
+и, при этом, который позволял бы приближать и нелинейные зависимости определенных видов. Идея ядерных методов заключается в
+том, что пространство признаков, в котором зависимость нелинейная, можно отобразить в другое пространство, в котором она уже
+будет линейной. Это пространство называется \textbf{спрямляющим}. При этом на самом деле, достаточно знать только как выражается скалярное
+произведение в новом пространстве, что мы и будем называть функцией ядра. Далее рассмотрим теоретический аспект подробнее.
+
+%------------------------------------------------
+\section{Задача линейной классификации}
+Мы будем рассматривать задачу классификации объектов исходных данных. Каждый объект будет отнесён в класс 1 или 2 в зависимости от своих свойств, что очевидно мотивировано в задачах машинного обучения. Более конкретно, для заданного набора $\{x\}_{i = 1}^n \subset X$ мы хотим построить классификатор 
+\[a: X \xrightarrow{} \{0, 1\}.\]
+Понятно, что для реальных задач оправдано только $X = \mathbb{R}^n$, то есть классифицировать мы будем численные объекты с некоторым множеством признаков.
+
+\section{Метод опорных векторов}
+
+
+\section{Заключение}
+В данной работе мы рассмотрели задачи классификации и регресси в машинном обучении. Рассмотрели метод опорных векторов как их возможное решение, поставили задачу
+оптимизации и предложили алгоритм ее решения для обучения метода. Результаты показали, что метод применим для получения хорошего качества как на синтетических
+данных, так и на реальных. Кроме того, идеи перевода признаков в спрямляющее пространство применимы не только для линейных алгоритмов, но и для более сложных
+моделей.
+%------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+%	REFERENCE LIST
+%----------------------------------------------------------------------------------------
+
+\begin{thebibliography}{99} % Bibliography - this is intentionally simple in this template
+
+\bibitem[Shawe-Taylor, J., Cristianini, N., 2004]{Shawe-Taylor:2004dg}
+Shawe-Taylor, J., Cristianini, N. (2004).
+\newblock Kernel Methods for Pattern Analysis.
+\newblock {\em Cambridge University Press}
+
+\bibitem[S. Boyd, L. Vandenberghe, 2009]{Shawe-Taylor:2009dg}
+S. Boyd, L. Vandenberghe (2009).
+\newblock Convex Optimization.
+\newblock {\em Cambridge University Press}
+ 
+\end{thebibliography}
+
+%----------------------------------------------------------------------------------------
+
+\end{document}
