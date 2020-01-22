@@ -35,6 +35,8 @@ bool diffSignes(const d_8& a, const d_8& b) { // Функция, которая 
 
 class Engine { //Движок
 private:
+    size_t iterations = 0;
+    int move_step = 20;
     std::vector<atom>* atoms; //Указатель на массив молекул
     std::vector<border>* planes; //Указатель на массив стенок
     void changeCoords(); //Пересчитать координаты
@@ -73,6 +75,10 @@ private:
         return bumps;
     }
 
+    template <typename T> int sgn(T val) {
+        return (T(0) < val) - (val < T(0));
+    }
+
     void ProcessBump(atom& a) {
         const border& left = (*planes)[0];
         const border& right = (*planes)[1];
@@ -85,19 +91,35 @@ private:
         if (bmps % 2 == 1) {
             a.v.x *= -1;
         }
-        tmpPres += std::abs(a.v.x) * bmps;
+	tmpPres += std::abs(a.v.x) * bmps;
+	if (iterations % move_step == 0) {
+	    long double speedX = std::abs(left.v.x);
+	    a.v.x += sgn(a.v.x) * bmps * speedX * 2;
+	    tmpPres += speedX * 2 * bmps;
+	}
 
         bmps = ProcessBumpImpl(a.point.z, bottom.p1.z, top.p1.z);
         if (bmps % 2 == 1) {
             a.v.z *= -1;
         }
+
         tmpPres += std::abs(a.v.z) * bmps;
+	if (iterations % move_step == 0) {
+	    long double speedZ = std::abs(top.v.z);
+	    a.v.z += sgn(a.v.z) * bmps * speedZ * 2;
+	    tmpPres += speedZ * 2 * bmps;
+	}
 
         bmps = ProcessBumpImpl(a.point.y, background.p1.y, front.p1.y);
         if (bmps % 2 == 1) {
             a.v.y *= -1;
         }
         tmpPres += std::abs(a.v.y) * bmps;
+	if (iterations % move_step == 0) {
+	    long double speedY = std::abs(front.v.y);
+	    a.v.y += sgn(a.v.y) * bmps * speedY * 2;
+	    tmpPres += speedY * 2 * bmps;
+	}
     }
 
     void PrintAtoms() {
@@ -220,8 +242,8 @@ void Engine::movePlanes() {
         plane.p3.z += plane.v.z * dt;
         plane.p4.z += plane.v.z * dt;
     }
-    totalArea -= std::abs(speed) * dt * 4;
-    totV -= std::abs(speed) * dt;
+    totV = (1 - 2 * std::abs(speed) * dt) * (1 - 2 * std::abs(speed) * dt) * (1 - 2 * std::abs(speed) * dt);
+    totalArea = (1 - 2 * std::abs(speed) * dt) * (1 - 2 * std::abs(speed) * dt) * 6;
 }
 
 void Engine::startEngine() { //Эта функция запускается в отдельном потоке и постоянно обрабатывает следующее состояние системы через время dt
@@ -234,8 +256,11 @@ void Engine::startEngine() { //Эта функция запускается в �
     std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
     std::uniform_real_distribution<long double> dist2(-1, 1);
     while (true) {
+	++iterations;
         PrintAtoms();
-        movePlanes();
+	if (iterations % move_step == 0) {
+            movePlanes();
+	}
         changeCoords();// Пересчитываем координаты
 
 
