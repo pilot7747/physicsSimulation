@@ -19,9 +19,6 @@
 #include <random>
 #include <iomanip>
 
-//#include <boost/random/mersenne_twister.hpp>
-//#include <boost/random/beta_distribution.hpp>
-
 constexpr int intTimes = 500; //Количество раз, сколько нужно отработать удары об стенки
 
 unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
@@ -88,19 +85,19 @@ private:
         if (bmps % 2 == 1) {
             a.v.x *= -1;
         }
-        tmpPres.store(tmpPres.load() + (std::abs(a.v.x) * bmps ));
+        tmpPres += std::abs(a.v.x) * bmps;
 
         bmps = ProcessBumpImpl(a.point.z, bottom.p1.z, top.p1.z);
         if (bmps % 2 == 1) {
             a.v.z *= -1;
         }
-        tmpPres.store(tmpPres.load() + (std::abs(a.v.z) * bmps));
+        tmpPres += std::abs(a.v.z) * bmps;
 
         bmps = ProcessBumpImpl(a.point.y, background.p1.y, front.p1.y);
         if (bmps % 2 == 1) {
             a.v.y *= -1;
         }
-        tmpPres.store(tmpPres.load() + (std::abs(a.v.y) * bmps));
+        tmpPres += std::abs(a.v.y) * bmps;
     }
 
     void PrintAtoms() {
@@ -111,7 +108,7 @@ private:
     }
 public:
     std::vector<unsigned long long> distribution;
-    std::atomic<long double> tmpPres{0}; //Суммарная сила на стенки сосуда за время dt
+    long double tmpPres = 0; //Суммарная сила на стенки сосуда за время dt
     long double pressure = 0; //Давление
     long double timeLapsed = 0; //Просимулированное время
     unsigned long long bumps = 0; //Колво соударений
@@ -179,7 +176,7 @@ void Engine::changeCoords() {
 
 void Engine::doIntersections() { // Обработать пересечение перемещения молекулы со стенкой сосуда
     std::vector<atom>& atoms_cp = *atoms;
-    #pragma omp target teams distribute parallel for map(from:atoms_cp)
+    // #pragma omp target teams distribute parallel for map(from:atoms_cp)
     for (size_t i = 0; i < atoms_cp.size(); ++i) {
         ProcessBump(atoms_cp[i]);
     }
@@ -245,12 +242,12 @@ void Engine::startEngine() { //Эта функция запускается в �
         doIntersections();
         doBumps(); //Обрабатываем столкновения молекул
 
-        pressure = tmpPres.load() / totalArea * 2 * massOfmolecule / dt; //Получаем давление, деля силу на площадь
+        pressure = tmpPres / totalArea * 2 * massOfmolecule / dt; //Получаем давление, деля силу на площадь
 
         std::cout << bumps << std::endl;
         std::cout << pressure << std::endl;
 
-        tmpPres.store(0); //Сбрасываем давление
+        tmpPres = 0; //Сбрасываем давление
         timeLapsed += dt;
     }
 }
