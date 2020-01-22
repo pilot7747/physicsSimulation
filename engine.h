@@ -85,19 +85,19 @@ private:
         if (bmps % 2 == 1) {
             a.v.x *= -1;
         }
-        tmpPres.store(NanClip(tmpPres.load() / totalArea + (std::abs(a.v.x) * 2 / dt) / totalArea * massOfmolecule * bmps));
+        tmpPres.store(tmpPres.load() + (std::abs(a.v.x) * bmps ));
 
         bmps = ProcessBumpImpl(a.point.z, bottom.p1.z, top.p1.z);
         if (bmps % 2 == 1) {
             a.v.z *= -1;
         }
-        tmpPres.store(NanClip(tmpPres.load() / totalArea + (std::abs(a.v.z) * 2 / dt) / totalArea * massOfmolecule * bmps));
+        tmpPres.store(tmpPres.load() + (std::abs(a.v.z) * bmps));
 
         bmps = ProcessBumpImpl(a.point.y, background.p1.y, front.p1.y);
         if (bmps % 2 == 1) {
             a.v.y *= -1;
         }
-        tmpPres.store(NanClip(tmpPres.load() / totalArea + (std::abs(a.v.y) * 2 / dt) / totalArea * massOfmolecule * bmps));
+        tmpPres.store(tmpPres.load() + (std::abs(a.v.y) * bmps));
     }
 
     void PrintAtoms() {
@@ -135,12 +135,6 @@ void Engine::atomBumping(atom& a1, atom& a2) {
         --bumps;
         return;
     }
-    int i = 0;
-    while (true) {
-        if (i > 10000000) {
-            --bumps;
-            return;
-        }
         vec v1 = a1.v; //Сохраняем сюда вектор скорости первой молекулы
         vec v2 = a2.v; //Второй молекулы
         vec sum = v1 + v2; //Суммарный импульс (масса молекул одинакова, поэтому здесь и дальше мы ее не учитываем
@@ -169,9 +163,6 @@ void Engine::atomBumping(atom& a1, atom& a2) {
         v2 = sum - v1;
         a1.v = v1;
         a2.v = v2;
-        ++i;
-        break;
-    }
 }
 
 void Engine::changeCoords() {
@@ -197,7 +188,7 @@ void Engine::doBumps() {
     #pragma omp target teams distribute parallel for map(from:atoms_cp)
     for (int i = 0; i < atoms_cp.size(); ++i) {
         for (int j = i + 1; j < atoms_cp.size(); ++j) {
-            if (i != j && atoms_cp[i].getDistance(atoms_cp[j]) < 0.001) { //Если расстояние меньше 1мм, то сталкиваем их
+            if (i != j && atoms_cp[i].getDistance(atoms_cp[j]) < 0.003) { //Если расстояние меньше 1мм, то сталкиваем их
                 ++bumps; //Увеличиваем счетчик столкновений
                 atomBumping(atoms_cp[i], atoms_cp[j]); //Запускаем функцию выше
             }
@@ -249,7 +240,7 @@ void Engine::startEngine() { //Эта функция запускается в �
         doIntersections();
         doBumps(); //Обрабатываем столкновения молекул
 
-        pressure = tmpPres.load(); // totalArea; //Получаем давление, деля силу на площадь
+        pressure = tmpPres.load() / totalArea * 2 * massOfmolecule / dt; //Получаем давление, деля силу на площадь
 
         std::cout << bumps << std::endl;
         std::cout << pressure << std::endl;
