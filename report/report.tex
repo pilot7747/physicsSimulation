@@ -19,7 +19,7 @@
 %	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
 %----------------------------------------------------------------------------------------
 
-\documentclass[twoside,twocolumn]{article}
+\documentclass[twoside,twocolumn, 11pt]{article}
 \usepackage[english, russian]{babel}
 \usepackage{graphicx}
 \graphicspath{{Materials/graphics/}{Materials/graphs/}{Materials/}}  % папки с картинками
@@ -35,7 +35,7 @@
 
 \usepackage[english]{babel} % Language hyphenation and typographical rules
 
-\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
+\usepackage[hmarginratio=1:1, top=25mm, columnsep=20pt]{geometry} % Document margins
 \usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
 \usepackage{booktabs} % Horizontal rules in tables
 
@@ -64,8 +64,8 @@
 \usepackage{geometry} % Простой способ задавать поля
 \geometry{top=25mm}
 \geometry{bottom=30mm}
-\geometry{left=25mm}
-\geometry{right=25mm}
+% \geometry{left=25mm}
+% \geometry{right=25mm}
 
 \usepackage{titling} % Customizing the title section
 \usepackage{comment} % Для комментирования
@@ -73,16 +73,21 @@
 \usepackage{hyperref} % For hyperlinks in the PDF
 \usepackage{amssymb,amsmath,amsthm}
 
+\usepackage{mathtools}
+
 \theoremstyle{plain}
 \newtheorem{theorem}{Теорема}
 \newtheorem{lemma}{Лемма}
 \newtheorem{proposition}{Утверждение}
 \newtheorem{corollary}{Следствие}
+\newtheorem{conclusion}{Вывод}
 \theoremstyle{definition}
 \newtheorem{definition}{Определение}
 \newtheorem{notation}{Обозначение}
 \newtheorem{example}{Пример}
 \DeclareMathOperator{\sign}{sign}
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert} %палочки модуля
 
 %----------------------------------------------------------------------------------------
 %	TITLE SECTION
@@ -135,11 +140,11 @@
 \section{Цель работы}
 % ToDO : поменять в финальной версии
 \begin{enumerate}
-\item Связь макро- и микропараметров
-\item Проверить выполнение уравнения состояния идеального газа
-\item Проверить зависимость распределения скоростей от времени(сравнить с Максвеллом)
-\item Проверить уравнение адиабаты
-\item Оценить флуктуацию P,V,T. Сравнить с аналитическими формулами
+\item Связь макро- и микропараметров.
+\item Проверка выполнения уравнения состояния идеального газа.
+\item Проверить зависимость распределения скоростей от времени(сравнить с Максвеллом).
+\item Проверить уравнение адиабаты.
+\item Оценить флуктуацию P, V, T. Сравнить с аналитическими формулами.
 \end{enumerate}
 
 \section{Описание построенной модели}
@@ -216,35 +221,50 @@
 \end{table}
 
 \subsection{Распределение Максвелла}
+
 \indent Одной из самых важных частей работы было проверить установление распределения Максвелла модуля скоростей молекул. Для этого начальными параметрами симуляции были выбраны 1000 молекул одноатомного газа с массой молекулы $4.82 \cdot 10^{-26}$ кг, в сосуде, имеющим форму куба со стороной $15$см, которым были даны изначально одинаковые по модулю скорости, равные $284$ м/c. Уже после 3 секунд симуляционного времени, установилось максвелловское распределение по модулям скоростей молекул, которое изображено на рисунке.\\
 
-\indent Теоретически распределение должно иметь такую зависимость (обозначено на графике \textit{пунктиром}):
+\subsection{Графики полученные на основе вычислений.}
+\begin{figure}[!h]
+{\includegraphics[width=1\linewidth]{hist_v}}
+\caption{Распределение доли молекул $\Big(\dfrac{dn}{n} (\upsilon) \Big)$ по скоростям. \textit{Пунктиром} обозначено теоретическое распредление. }
+\end{figure}
+
+\indent Теоретически распределение должно иметь такую зависимость:
 \begin{equation}
 F(\upsilon) = \int_0^\infty 4\pi\upsilon^2 \Big( \dfrac{m}{2\pi kT} \Big)^{3/2}\cdot e^{-\dfrac{m \upsilon^2}{2kT}}
 \end{equation}
 
-% TODO: заминить график
-\begin{figure}[h]
+\subsubsection{Провекра гипотез. Q-Q plot}
+\indent Получили статистическое распределение частиц по абсолютным значениям скорости.
+Математически покажем, что полученная нами выборка скоростей молекул из распредления Максвелла. Для этого воспользуемся критериям согласия,
+а именно критерием Колмагорова, критическое множество которого:
+\[\sqrt{n} \cdot \sup\limits_{x \in R}{\abs{\hat{F_n}(x)- F_0(x)} > K_{1-\alpha}} \]
+Фотка или какой-то пруф отвержения.
 
-\begin{minipage}[H]{0.49\linewidth}
-\center{\includegraphics[width=1\linewidth]{intFact1.png}\\ Скорость молекулы от её номера}
-\end{minipage}
-\begin{minipage}[H]{0.49\linewidth}
-\center{\includegraphics[width=1\linewidth]{intFact2.png} \\ Распределение скоростей по оси OX, аналогично по OY, OZ}
-\end{minipage}
 
-\caption{Установление скоростей при прошествии большого количества времени}
-
-\end{figure}
-
-% TODO: заменить график
+\indent То, что критерий Колмагорова отверг нашу гипотезу справедливо, мы видим различие наших распределений на графиках,
+для того чтобы убедиться в стастической значимости критерия воспользуемся Q-Q plot:
 \begin{figure}[!h]
-{\includegraphics[width=1\linewidth]{distribution.png}}
-\caption{Распределение доли молекул $\Big(\dfrac{dn}{n} (\upsilon) \Big)$ по скоростям, полученное через большой промежуток времени}
+{\includegraphics[width=1\linewidth]{qqplot}}
+\caption{Q-Q plot}
 \end{figure}
 
-\textbf{Вывод:}
+
+\begin{conclusion}
+Из графика заметим, что распределение "немного" смещенно относительно теоретического, да и кретирий Колмагорова отверг нашу гипотезу.
+Но с помощью Q-Q plot мы убедились, что распредление очень близко к Максвеллу.
+\end{conclusion}
+
 Также были построены графики скоростей молекул и распределение проекций скоростей на ось $OX$. Заметим небольшое смещение гистограммы относительно аналитически полученного распределения влево. Это может быть связано с тем, что распределение направлений при столкновении молекул на самом деле не является равномерным. Такая неточность дает небольшую ошибку, но это можно будет учесть в последующих версиях программы.
+
+\subsection{Распределение давления}
+Построим график распредления....
+% TODO: написать текст
+\begin{figure}[h!]
+{\includegraphics[width=1\linewidth]{hist_p}}
+\caption{Распределение давления на стенки сосуда}
+\end{figure}
 
 \subsection{Распределение по энергиям в поле силы тяжести}
 
@@ -254,7 +274,7 @@ F(\upsilon) = \int_0^\infty 4\pi\upsilon^2 \Big( \dfrac{m}{2\pi kT} \Big)^{3/2}\
 % TODO: заменить
 \begin{figure}[!h]
 {\includegraphics[width=1\linewidth]{Maksvell-Bolcman.png}}
-\caption{Распределение доли молекул $\Big(\dfrac{dn}{n} (\upsilon) \Big)$ по скоростям, полученное через большой промежуток времени}
+\caption{Распределение доли молекул $\Big(\dfrac{dn}{n} (\upsilon) \Big)$ по энергиям, полученное через большой промежуток времени}
 \end{figure}
 
 \begin{comment}
@@ -287,21 +307,24 @@ F(\upsilon) = \int_0^\infty 4\pi\upsilon^2 \Big( \dfrac{m}{2\pi kT} \Big)^{3/2}\
 
 
 % ToDO : написать в виде \theoremstyle{conclusion}
-\textbf{Вывод:}
+\begin{conclusion}
 Адиабатический процесс над газом чувствителен к числу молекул в сосуде и шагу времени симуляции, поэтому заметна некоторая
 ошибка между аналитической формулой и полученной зависимостью. Однако, ясно видно, что степенная зависимость
-похожа на действительную (то есть $\gamma \approx \dfrac{5}{3}$)
+похожа на действительную (то есть $\gamma \approx \dfrac{5}{3}$).
+\end{conclusion}
 
 \section{Заключение}
 % ToDO Общий вывод: что получилось, что нет, что ожидается в будующем. Сюда по максимуму можно напихать
 \indent Получили состоятельную модель идеального газа с помощью которой проверили основые законы термодинамики. Построили гипотезу о том,
 что скорости молекул распредлены по Максвеллу.
 
-Ожидается в будующем:
+\subsection{Ожидается в будующем:}
 \begin{itemize}
 \item Неидеаьный газ.
 Используя потенциал потенциал Леннард-Джонса $ U(z)=4 \varepsilon\left\{\left(\frac{\sigma}{z}\right)^{12}-\left(\frac{\sigma}{z}\right)^{6}\right\}$, попробовали
 расчитывать силу $F = \dfrac{dU}{dz}$
+% ToDO: тут можно написать с какими проблемами столкунуись.
+\item Увеличение числа молекул.
 \end{itemize}
 
 %----------------------------------------------------------------------------------------
