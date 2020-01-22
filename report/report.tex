@@ -100,13 +100,16 @@
 \date{\today} % Leave empty to omit a date
 \renewcommand{\maketitlehookd}{%
 \begin{abstract}
-% ToDO - исправить 
+% ToDO - исправить
 \noindent В данной статье расматривается модель идеального газа, проверяются некотороые основные законы термодинамики.
 \end{abstract}
 }
 
 %----------------------------------------------------------------------------------------
 
+%  ToDO
+%  1. запустить Spell Checker
+%  2. Разместить ссылку на гитхаб в начале дока
 \begin{document}
 
 % Print the title
@@ -165,7 +168,7 @@
 \overline{f} = \dfrac{1}{\tau} \sum_{j=1}^n 2 m_i \upsilon_i
 \end{equation}
 
-Число столкновений j-й частицы за интервал времени T равно:
+Число столкноений j-й частицы за интервал времени T равно:
 \[K_j = \dfrac{T \upsilon_j }{2\tau} \]
 \[\overline{f} = \sum_{j = 1}^N \dfrac{m_j \upsilon_j^2}{L_z}\]
 
@@ -179,7 +182,6 @@
 
 \[PV = \nu R T \]
 
-% ToDO : обновить таблицу?
 \begin{table}[h!]
 \centering
 \label{Table 1}
@@ -203,7 +205,7 @@
 & & & &                                         \\
 104,95 & 1 & 20000 & 2,9 & 2,90                                    \\ \hline
 \end{tabular}
-\caption{Сравнение Уравнения Менделеева-Клапейрона и давление полученное с помощью нашей модели}
+\caption{Сравнение давления полученного из уравнения Менделеева-Клапейрона и с помощью нашей модели}
 \end{table}
 
 \subsection{Распределение Максвелла}
@@ -214,7 +216,7 @@
 F(\upsilon) = \int_0^\infty 4\pi\upsilon^2 \Big( \dfrac{m}{2\pi kT} \Big)^{3/2}\cdot e^{-\dfrac{m \upsilon^2}{2kT}}
 \end{equation}
 
-% TODO: заменить
+% TODO: заминить график
 \begin{figure}[h]
 
 \begin{minipage}[H]{0.49\linewidth}
@@ -228,7 +230,7 @@ F(\upsilon) = \int_0^\infty 4\pi\upsilon^2 \Big( \dfrac{m}{2\pi kT} \Big)^{3/2}\
 
 \end{figure}
 
-% TODO: заменить
+% TODO: заменить график
 \begin{figure}[!h]
 {\includegraphics[width=1\linewidth]{distribution.png}}
 \caption{Распределение доли молекул $\Big(\dfrac{dn}{n} (\upsilon) \Big)$ по скоростям, полученное через большой промежуток времени}
@@ -273,7 +275,7 @@ F(\upsilon) = \int_0^\infty 4\pi\upsilon^2 \Big( \dfrac{m}{2\pi kT} \Big)^{3/2}\
 % TODO: заменить
 \begin{figure}[!h]
 {\includegraphics[width=1\linewidth]{adiabata.png}}
-\caption{} 
+\caption{}
 Где \textcolor{blue}{--------} - наша, \textcolor{orange}{--------} - уравнение адиабаты
 \end{figure}
 
@@ -285,9 +287,16 @@ F(\upsilon) = \int_0^\infty 4\pi\upsilon^2 \Big( \dfrac{m}{2\pi kT} \Big)^{3/2}\
 похожа на действительную (то есть $\gamma \approx \dfrac{5}{3}$)
 
 \section{Заключение}
-% ToDO Общий вывод: что получилось, что нет, что ожидается в будующем. Сюда по максимуму можно напихать 
-%------------------------------------------------
+% ToDO Общий вывод: что получилось, что нет, что ожидается в будующем. Сюда по максимуму можно напихать
+\indent Получили состоятельную модель идеального газа с помощью которой проверили основые законы термодинамики. Построили гипотезу о том,
+что скорости молекул распредлены по Максвеллу.
 
+Ожидается в будующем:
+\begin{itemize}
+\item Неидеаьный газ.
+Используя потенциал потенциал Леннард-Джонса $ U(z)=4 \varepsilon\left\{\left(\frac{\sigma}{z}\right)^{12}-\left(\frac{\sigma}{z}\right)^{6}\right\}$, попробовали
+расчитывать силу $F = \dfrac{dU}{dz}$
+\end{itemize}
 
 %----------------------------------------------------------------------------------------
 %	REFERENCE LIST
