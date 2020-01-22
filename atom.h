@@ -75,7 +75,7 @@ struct vec { //Вектор
     
     bool equal(const vec& v) const { // Приблизительная проверка равенства векторов
         vec tmp = *this - v;
-        if (tmp * tmp < 0.05) {
+        if (tmp * tmp < 0.02) {
             return true;
         }
         return false;

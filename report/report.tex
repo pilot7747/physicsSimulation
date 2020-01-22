@@ -1,0 +1,306 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Journal Article
+% LaTeX Template
+% Version 1.4 (15/5/16)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% Original author:
+% Frits Wenneker (http://www.howtotex.com) with extensive modifications by
+% Vel (vel@LaTeXTemplates.com)
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND OTHER DOCUMENT CONFIGURATIONS
+%----------------------------------------------------------------------------------------
+
+\documentclass[twoside,twocolumn]{article}
+\usepackage[english, russian]{babel}
+\usepackage{graphicx}
+\graphicspath{{Materials/graphics/}{Materials/}}  % папки с картинками
+\usepackage[utf8]{inputenc}
+\usepackage{blindtext} % Package to generate dummy text throughout this template
+
+\usepackage[sc]{mathpazo} % Use the Palatino font
+\usepackage[T1]{fontenc} % Use 8-bit encoding that has 256 glyphs
+\linespread{1.05} % Line spacing - Palatino needs more space between lines
+\usepackage{microtype} % Slightly tweak font spacing for aesthetics
+
+\usepackage[english]{babel} % Language hyphenation and typographical rules
+
+\usepackage[hmarginratio=1:1,top=32mm,columnsep=20pt]{geometry} % Document margins
+\usepackage[hang, small,labelfont=bf,up,textfont=it,up]{caption} % Custom captions under/above floats in tables or figures
+\usepackage{booktabs} % Horizontal rules in tables
+
+\usepackage{lettrine} % The lettrine is the first enlarged letter at the beginning of the text
+
+\usepackage{enumitem} % Customized lists
+\setlist[itemize]{noitemsep} % Make itemize lists more compact
+
+\usepackage{abstract} % Allows abstract customization
+\renewcommand{\abstractnamefont}{\normalfont\bfseries} % Set the "Abstract" text to bold
+\renewcommand{\abstracttextfont}{\normalfont\small\itshape} % Set the abstract itself to small italic text
+
+\usepackage{titlesec} % Allows customization of titles
+\renewcommand\thesection{\Roman{section}} % Roman numerals for the sections
+\renewcommand\thesubsection{\roman{subsection}} % roman numerals for subsections
+\titleformat{\section}[block]{\large\scshape\centering}{\thesection.}{1em}{} % Change the look of the section titles
+\titleformat{\subsection}[block]{\large}{\thesubsection.}{1em}{} % Change the look of the section titles
+
+\usepackage{fancyhdr} % Headers and footers
+\pagestyle{fancy} % All pages have headers and footers
+\fancyhead{} % Blank out the default header
+\fancyfoot{} % Blank out the default footer
+\fancyhead[C]{The Kernel Trick $\bullet$ Декабрь 2019 $\bullet$ МФТИ} % Custom header text
+\fancyfoot[RO,LE]{\thepage} % Custom footer text
+
+\usepackage{titling} % Customizing the title section
+\usepackage{comment} % Для комментирования
+
+\usepackage{hyperref} % For hyperlinks in the PDF
+\usepackage{amssymb,amsmath,amsthm}
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Теорема}
+\newtheorem{lemma}{Лемма}
+\newtheorem{proposition}{Утверждение}
+\newtheorem{corollary}{Следствие}
+\theoremstyle{definition}
+\newtheorem{definition}{Определение}
+\newtheorem{notation}{Обозначение}
+\newtheorem{example}{Пример}
+\DeclareMathOperator{\sign}{sign}
+
+%----------------------------------------------------------------------------------------
+%	TITLE SECTION
+%----------------------------------------------------------------------------------------
+
+\setlength{\droptitle}{-4\baselineskip} % Move the title up
+
+\pretitle{\begin{center}\Huge\bfseries} % Article title formatting
+\posttitle{\end{center}} % Article title closing formatting
+\title{Компьютерное моделирование идеального газа, распределение Максвелла, флуктуации.} % Article title
+\author{%
+\textsc{Н. В. Павличенко, А. С. Подкидышев} \\[1ex] % Your name
+\normalsize Московский физико-технический институт \\ % Your institution
+\normalsize \href{mailto:pavlichenko.nv@phystech.edu}{pavlichenko.nv@phystech.edu}
+\href{mailto:pavlichenko.nv@phystech.edu}{podkidishev.as@phystech.edu}% Your email address
+%\and % Uncomment if 2 authors are required, duplicate these 4 lines if more
+%\textsc{Jane Smith}\thanks{Corresponding author} \\[1ex] % Second author's name
+%\normalsize University of Utah \\ % Second author's institution
+%\normalsize \href{mailto:jane@smith.com}{jane@smith.com} % Second author's email address
+}
+\date{\today} % Leave empty to omit a date
+\renewcommand{\maketitlehookd}{%
+\begin{abstract}
+\noindent В данной статье расматривается ...
+\end{abstract}
+}
+
+%----------------------------------------------------------------------------------------
+
+\begin{document}
+
+% Print the title
+\maketitle
+%----------------------------------------------------------------------------------------
+%	ARTICLE CONTENTS
+%----------------------------------------------------------------------------------------
+
+\section{Введение}
+% TODO : написать введение
+
+\lettrine[nindent=0em,lines=3]{Л} {инейные методы} использовались с самого зарождения таких наук как статистика и машинное обучение.
+ Они действительно хороши с теоретической точки зрения: для них доказано много теорем, найдены
+довереительные интервалы для отклика в различных моделях и, более того, существует аналитическое решение для нахождения
+оптимальных параметров алгоритма. Однако они имеют существенные проблемы: они очень плохо работают при нелинейных
+зависимостях в данных. Собственно, хотелось бы иметь метод, который позволял бы использовать все достоинства линейных моделей
+и, при этом, который позволял бы приближать и нелинейные зависимости определенных видов. Идея ядерных методов заключается в
+том, что пространство признаков, в котором зависимость нелинейная, можно отобразить в другое пространство, в котором она уже
+будет линейной. Это пространство называется \textbf{спрямляющим}. При этом на самом деле, достаточно знать только как выражается скалярное
+произведение в новом пространстве, что мы и будем называть функцией ядра. Далее рассмотрим теоретический аспект подробнее.
+
+%------------------------------------------------
+\section{Цель работы}
+
+\section{Описание построенной модели}
+
+\indent То, чем мы руководствуемся при моделировании микроскопических параметров. И как с помощью них измеряем макропараметры.
+
+\subsection{Соударение молекул друг с другом}
+% ToDO: норм написать про "нечестные" соударения
+
+\indent Критически важной выглядит задача обработки соударений частиц, так как именно от точности этого алгоритма будет зависеть установление распределений скоростей, энергий, и других параметров системы.
+Для этого воспользуемся задачей об угле рассеивания при налете одного шара на другой.
+Сначала перейдем в систему отсчета второй молекулы (до удара). Тогда в ней вторая частица будет неподвижна и мы сможем свести задачу к обозначенной выше. Теперь перейдем к системе отсчета центра масс. Итоговый вектор перехода равен
+\begin{equation}
+\overrightarrow{W} = \overrightarrow{v_2} + \frac{1}{2}\overrightarrow{v_1}.
+\end{equation}
+\indent Скорость первой молекулы в новой системе координат тогда $\overrightarrow{v}$.
+Теперь построим ортонормированный базис в плоскости соударения. Пусть $\overrightarrow{x} = \frac{\overrightarrow{v}}{|v|}$, $\overrightarrow{z} = \frac{[\overrightarrow{v_1}, \overrightarrow{v_2}]}{|[\overrightarrow{v_1}, \overrightarrow{v_2}]|}$, $\overrightarrow{y} = \frac{[\overrightarrow{x}, \overrightarrow{z}]}{|[\overrightarrow{x}, \overrightarrow{z}]|}$. Затем возьмем случайный угол в плоскости $XY$, получится единичный вектор $\overrightarrow{u} = x \cdot \cos \alpha + y \cdot \sin \alpha$. Вспомним, что в СЦМ при налете одной частицы на другую, модуль скорости налетающей частицы остается неизменным. Тогда $w = |v| \cdot \overrightarrow{u}$ — это вектор в СЦМ после столкновения. Тогда в лабораторной системе отсчета вектор $\overrightarrow{\widetilde{v_1}} = \overrightarrow{w} + \overrightarrow{W}$. Отсюда из закона сохранения импульса $\overrightarrow{\widetilde{v_2}} = \overrightarrow{v_1} + \overrightarrow{v_2} - \overrightarrow{\widetilde{v_1}}$.
+\subsection{Соударение молекул о стенки сосуда}
+Рассмотрим задачу о вычислении давления идеального газа на стенку сосуда. Среднее суммарная сила будет даваться формулой
+\begin{equation}
+\overline{f} = \dfrac{1}{\tau} \int_0^\tau dt \sum_{i=1}^n f_i(t) = \sum_{i=1}^n \dfrac{1}{\tau} \int_0^\tau dt f_i(t)
+\end{equation}
+
+После соударения молекулы со стенкой её импульс($p$) меняется:
+\[p(T) - p(0) = \int_0^\tau f_i(t) dt \]
+
+Поскольку $M_\text{стенки} \gg m_\text{молекулы}$:
+\[\Delta p = 2m\upsilon \]где $\upsilon$ - проекция на скорости перпендикулярная соответствующей стенки
+
+\textbf{Итого}:
+
+\begin{equation}
+\overline{f} = \dfrac{1}{\tau} \sum_{j=1}^n 2 m_i \upsilon_i
+\end{equation}
+
+Число столкновений j-й частицы за интервал времени T равно:
+\[K_j = \dfrac{T \upsilon_j }{2\tau} \]
+\[\overline{f} = \sum_{j = 1}^N \dfrac{m_j \upsilon_j^2}{L_z}\]
+
+Т.к объем сосуда $V = L_x \cdot L_y \cdot L_z$
+
+\begin{center}
+\fbox{$ P = \dfrac{\overline{f}}{L_x L_y} = \dfrac{1}{V} \sum_{j=1}^N m_j \upsilon_j^2 $}
+\end{center}
+
+\indent С помощью полученной формулы найдем $P$ и сравним его с уравнением Клапейрона-Менделеева:
+
+\[PV = \nu R T \]
+
+\begin{table}[h!]
+\centering
+\label{Table 1}
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+\multicolumn{1}{|c|}{T, K} & \multicolumn{1}{c|}{V, m/s} & \multicolumn{1}{c|}{N} & \multicolumn{1}{c|}{P, $10^{-17}$} & \multicolumn{1}{c|}{P, $10^{-17}$} \\ \hline
+104,69 & 1 & 7000 & 1,01 & 1,01                                    \\
+& & & &                                         \\
+186,95 & 1 & 10000 & 2,58 & 2,58                                    \\
+& & & &                                         \\
+291,25 & 1 & 10000 & 4,02 & 4,02                                    \\
+418,00 & 1 & 10000 & 5,79 & 5,77                                    \\
+570,43 & 1 & 10000 & 7,88 & 7,88                                    \\
+& & & &                                         \\
+104,62 & 1 & 10000 & 1,44 & 1,44                                    \\
+104,63 & 0,729 & 10000 & 1,98 & 1,98                                    \\
+104,63 & 0,512 & 10000 & 2,82 & 2,82                                    \\
+104,63 & 0,343 & 10000 & 4,2 & 4,21                                    \\
+104,63 & 0,216 & 10000 & 6,7 & 6,69                                    \\
+104,63 & 0,125 & 10000 & 11,5 & 11,56                                   \\
+& & & &                                         \\
+104,95 & 1 & 20000 & 2,9 & 2,90                                    \\ \hline
+\end{tabular}
+\caption{Сравнение Уравнения Менделеева-Клапейрона и давление полученное с помощью нашей модели}
+\end{table}
+
+\subsection{Распределение Максвелла}
+\indent Одной из самых важных частей работы было проверить установление распределения Максвелла модуля скоростей молекул. Для этого начальными параметрами симуляции были выбраны 1000 молекул одноатомного газа с массой молекулы $4.82 \cdot 10^{-26}$ кг, в сосуде, имеющим форму куба со стороной $15$см, которым были даны изначально одинаковые по модулю скорости, равные $284$ м/c. Уже после 3 секунд симуляционного времени, установилось максвелловское распределение по модулям скоростей молекул, которое изображено на рисунке.\\
+
+\indent Теоретически распределение должно иметь такую зависимость (обозначено на графике \textit{пунктиром}):
+\begin{equation}
+F(\upsilon) = \int_0^\infty 4\pi\upsilon^2 \Big( \dfrac{m}{2\pi kT} \Big)^{3/2}\cdot e^{-\dfrac{m \upsilon^2}{2kT}}
+\end{equation}
+
+\begin{figure}[h]
+
+\begin{minipage}[H]{0.49\linewidth}
+\center{\includegraphics[width=1\linewidth]{intFact1.png}\\ Скорость молекулы от её номера}
+\end{minipage}
+\begin{minipage}[H]{0.49\linewidth}
+\center{\includegraphics[width=1\linewidth]{intFact2.png} \\ Распределение скоростей по оси OX, аналогично по OY, OZ}
+\end{minipage}
+
+\caption{Установление скоростей при прошествии большого количества времени}
+
+\end{figure}
+
+\begin{figure}[!h]
+{\includegraphics[width=1\linewidth]{distribution.png}}
+\caption{Распределение доли молекул $\Big(\dfrac{dn}{n} (\upsilon) \Big)$ по скоростям, полученное через большой промежуток времени}
+\end{figure}
+
+\textbf{Вывод:}
+Также были построены графики скоростей молекул и распределение проекций скоростей на ось $OX$. Заметим небольшое смещение гистограммы относительно аналитически полученного распределения влево. Это может быть связано с тем, что распределение направлений при столкновении молекул на самом деле не является равномерным. Такая неточность дает небольшую ошибку, но это можно будет учесть в последующих версиях программы.
+
+
+\subsection{Распределение по энергиям в поле силы тяжести}
+
+Дополнительно рассмотрим распределение энергий в поле потенциальных сил. Для примера рассмотрим систему, в которой установилось максвелловское распределение по скоростям, состоящую из 1000 частиц в кубе $0.15 \times 0.15 \times 0.15$м при температуре $104$К, в поле силы тяжести.\\
+\indent На рисунке изображена гистограмма, распределения по энергиям после 30 секунд симуляционного времени. Как можно заметить, зависимость доли частиц от энергии является экспоненциальной, и можно предположить, что она представляет из себя распределение Больцмана.
+
+\begin{figure}[!h]
+{\includegraphics[width=1\linewidth]{Maksvell-Bolcman.png}}
+\caption{Распределение доли молекул $\Big(\dfrac{dn}{n} (\upsilon) \Big)$ по скоростям, полученное через большой промежуток времени}
+\end{figure}
+
+\begin{comment}
+\subsection{Определение зависимости распределения скоростей от времени. Чтобы понять через какое время устанавливается распределение Максвелла \textbf{[В разработке]}}
+\begin{Large}
+
+\begin{center}
+\textbf{В разработке}
+\end{center}
+
+\end{Large}
+
+\end{comment}
+
+\subsection{Уравнение адиабаты}
+\textit{"Сожмем"} наш газ под поршнем и измерим зависимость P(V):
+Уравнение адиабаты для идеального газа:
+\[PV^\gamma = const \]
+
+Тогда зная начальную точку $P_0, V_0$ не трудно построить график $P(V)$:
+\[P = \dfrac{P_0 V_0^\gamma}{V ^\gamma} \]
+Т.к мы моделируем одноатомный газ, то $\gamma = \dfrac{5}{3}$
+
+\begin{figure}[!h]
+{\includegraphics[width=1\linewidth]{adiabata.png}}
+\caption{Сравнение графика адиабаты нашей системы и уравнением адиабаты. \hspace{30ex}
+Где \textcolor{blue}{--------} - наша, \textcolor{Orange}{--------} - уравнение адиабаты}
+\end{figure}
+
+
+% ToDO : написать в виде \theoremstyle{conclusion}
+\textbf{Вывод:}
+Адиабатический процесс над газом чувствителен к числу молекул в сосуде и шагу времени симуляции, поэтому заметна некоторая
+ошибка между аналитической формулой и полученной зависимостью. Однако, ясно видно, что степенная зависимость
+похожа на действительную (то есть $\gamma \approx \dfrac{5}{3}$)‰
+
+\section{Заключение}
+В данной работе мы рассмотрели задачи классификации и регресси в машинном обучении. Рассмотрели метод опорных векторов как их возможное решение, поставили задачу
+оптимизации и предложили алгоритм ее решения для обучения метода. Результаты показали, что метод применим для получения хорошего качества как на синтетических
+данных, так и на реальных. Кроме того, идеи перевода признаков в спрямляющее пространство применимы не только для линейных алгоритмов, но и для более сложных
+моделей.
+%------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+%	REFERENCE LIST
+%----------------------------------------------------------------------------------------
+
+\begin{thebibliography}{99} % Bibliography - this is intentionally simple in this template
+
+\bibitem[Shawe-Taylor, J., Cristianini, N., 2004]{Shawe-Taylor:2004dg}
+Shawe-Taylor, J., Cristianini, N. (2004).
+\newblock Kernel Methods for Pattern Analysis.
+\newblock {\em Cambridge University Press}
+
+\bibitem[S. Boyd, L. Vandenberghe, 2009]{Shawe-Taylor:2009dg}
+S. Boyd, L. Vandenberghe (2009).
+\newblock Convex Optimization.
+\newblock {\em Cambridge University Press}
+
+\end{thebibliography}
+
+%----------------------------------------------------------------------------------------
+
+\end{document}

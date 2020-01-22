@@ -19,6 +19,9 @@
 #include <random>
 #include <iomanip>
 
+#include <boost/random/mersenne_twister.hpp>
+#include <boost/random/beta_distribution.hpp>
+
 constexpr int intTimes = 500; //Количество раз, сколько нужно отработать удары об стенки
 
 unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
@@ -139,8 +142,10 @@ void Engine::atomBumping(atom& a1, atom& a2) {
         vec v2 = a2.v; //Второй молекулы
         vec sum = v1 + v2; //Суммарный импульс (масса молекул одинакова, поэтому здесь и дальше мы ее не учитываем
         d_8 energy = v1 * v1 + v2 * v2; //Удвоенная кинетическая энергия
-        auto a = dist1(generator);
-
+        auto a = dist1(generator) * M_PI;
+        if (rand() % 2 == 0) {
+            a = 2 * M_PI - a;
+        }
         vec z = v1.cross(v2);
         z = z.norm();
         vec dobavka = v2;
