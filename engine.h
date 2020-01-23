@@ -243,7 +243,7 @@ void Engine::movePlanes() {
         plane.p4.z += plane.v.z * dt;
     }
     totV = (1 - 2 * std::abs(speed) * dt) * (1 - 2 * std::abs(speed) * dt) * (1 - 2 * std::abs(speed) * dt);
-    totalArea = (1 - 2 * std::abs(speed) * dt) * (1 - 2 * std::abs(speed) * dt) * 6;
+    totalArea = (1 - 2 * std::abs(speed) * dt) * (1 - 2 * std::abs(speed) * dt) * 6; // сжимаем с двух сторон
 }
 
 void Engine::startEngine() { //Эта функция запускается в отдельном потоке и постоянно обрабатывает следующее состояние системы через время dt
@@ -252,9 +252,6 @@ void Engine::startEngine() { //Эта функция запускается в �
     std::cout << massOfmolecule << std::endl;
     std::cout << k << std::endl;
 
-    std::default_random_engine generator;
-    std::uniform_real_distribution<long double> dist1(0, 2 * M_PI);
-    std::uniform_real_distribution<long double> dist2(-1, 1);
     while (true) {
 	++iterations;
         PrintAtoms();
@@ -262,7 +259,6 @@ void Engine::startEngine() { //Эта функция запускается в �
             movePlanes();
 	}
         changeCoords();// Пересчитываем координаты
-
 
         doIntersections();
         doBumps(); //Обрабатываем столкновения молекул
