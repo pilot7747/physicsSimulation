@@ -150,6 +150,7 @@ void startThread() {
 }
 
 int main(int argc, char *argv[]) {
+    std::ios_base::sync_with_stdio(false);
     srand(4);
     maximumSpeed = atoi(argv[2]);
     InitializeObjects(atoi(argv[1])); //Создаем объекты
