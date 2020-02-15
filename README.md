@@ -7,7 +7,7 @@
 [Демонстрация](https://www.youtube.com/watch?v=4M_ZC6nT7mI)
 Состояение системы в момент dt |  
 :-------------------------:|:-------------------------:
-![](./report/Materials/graphs/ui.png)  |  ![](./report/Materials/graphs/particles.pdf)
+![](./report/Materials/graphs/ui.png)  |  ![](./report/Materials/graphs/particles-1.png)
 
 # ToDO
 - [] [Труды МФТИ](https://mipt.ru/science/trudy/priyom_new/)
