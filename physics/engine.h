@@ -1,11 +1,3 @@
-//
-//  engine.h
-//  physics
-//
-//  Created by Никита on 16.04.2018.
-//  Copyright © 2018 Nikita Pavlichenko. All rights reserved.
-//
-
 #ifndef engine_h
 #define engine_h
 #include "atom.h"
@@ -16,7 +8,7 @@
 
 constexpr int intTimes = 200; //Количество раз, сколько нужно отработать удары об стенки
 constexpr long double totalArea = 1 * 2 + 1.2 * 4; //Площадь поверхности сосуда
-constexpr long double massOfmolecule = 0.0000000000000000000000000482; //Масса молекулы
+constexpr long double massOfmolecule = 0.0000000000000000000000000482; //Масса молекулы(это воздух если что)
 
 using namespace std::literals;
 
@@ -48,7 +40,7 @@ private:
     std::vector<border>* planes; //Указатель на массив стенок
     void changeCoords(); //Пересчитать координаты
     void doIntersections(); //Обработать удары об стенки
-    
+
     void mirror(atom &a, const border &plane) { // Отразить относительно плоскости (можно, наверное, переделать)
         if (plane.type == borderType::horizontal) {
             a.point.z += (plane.p1.z - a.point.z) * 2;
@@ -64,14 +56,14 @@ private:
         a.v.y *= -1;
         tmpPres += (abs(a.v.y) * 2 / dt) * massOfmolecule; //Изменение имульса
     }
-    
+
 public:
     long double tmpPres = 0; //Суммарная сила на стенки сосуда за время dt
     long double pressure = 0; //Давление
     Engine() {}
     Engine(std::vector<atom>* _atoms, std::vector<border>* _planes) : atoms(_atoms), planes(_planes) {}
     void startEngine(); //Запуск
-    
+
 };
 
 void Engine::changeCoords() {

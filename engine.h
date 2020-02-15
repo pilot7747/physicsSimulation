@@ -1,11 +1,3 @@
-//
-//  engine.h
-//  physics
-//
-//  Created by Никита on 16.04.2018.
-//  Copyright © 2018 Nikita Pavlichenko. All rights reserved.
-//
-
 #ifndef engine_h
 #define engine_h
 #include "atom.h"
@@ -19,20 +11,6 @@
 #include <random>
 #include <iomanip>
 
-constexpr int intTimes = 500; //Количество раз, сколько нужно отработать удары об стенки
-
-unsigned concurentThreadsSupported = std::thread::hardware_concurrency();
-
-long double NanClip(long double number) {
-    return std::isnan(number) ? 0 : number;
-}
-
-using namespace std::literals;
-
-bool diffSignes(const d_8& a, const d_8& b) { // Функция, которая проверяет разные ли знаки у двух чисел
-    return (a <= 0 && b >= 0) || (a >= 0 && b <= 0);
-}
-
 class Engine { //Движок
 private:
     size_t iterations = 0;
@@ -42,7 +20,7 @@ private:
     void changeCoords(); //Пересчитать координаты
     void doIntersections();
     void doBumps(); //Обработать столкновения
-    void movePlanes(); //Передвинуть стенки сосуда
+    void movePlanes(); //Передвинуть стенки сосуда (для адиабаты например )
     void atomBumping(atom& a1, atom& a2); //Столкновение молекул
     constexpr static unsigned long long max_speed = 1;
 
@@ -93,7 +71,7 @@ private:
         }
 	tmpPres += std::abs(a.v.x) * bmps;
 	if (iterations % move_step == 0) {
-	    long double speedX = std::abs(left.v.x);
+        long double speedX = std::abs(left.velocity.x);
 	    a.v.x += sgn(a.v.x) * bmps * speedX * 2;
 	    tmpPres += speedX * 2 * bmps;
 	}
@@ -105,7 +83,7 @@ private:
 
         tmpPres += std::abs(a.v.z) * bmps;
 	if (iterations % move_step == 0) {
-	    long double speedZ = std::abs(top.v.z);
+        long double speedZ = std::abs(top.velocity.z);
 	    a.v.z += sgn(a.v.z) * bmps * speedZ * 2;
 	    tmpPres += speedZ * 2 * bmps;
 	}
@@ -116,7 +94,7 @@ private:
         }
         tmpPres += std::abs(a.v.y) * bmps;
 	if (iterations % move_step == 0) {
-	    long double speedY = std::abs(front.v.y);
+        long double speedY = std::abs(front.velocity.y);
 	    a.v.y += sgn(a.v.y) * bmps * speedY * 2;
 	    tmpPres += speedY * 2 * bmps;
 	}
@@ -224,23 +202,23 @@ void Engine::doBumps() {
 void Engine::movePlanes() {
     d_8 speed = 0;
     for (auto& plane : *planes) {
-        if (plane.v.x != 0) {
-            speed = plane.v.x;
+        if (plane.velocity.x != 0) {
+            speed = plane.velocity.x;
         }
-        plane.p1.x += plane.v.x * dt;
-        plane.p2.x += plane.v.x * dt;
-        plane.p3.x += plane.v.x * dt;
-        plane.p4.x += plane.v.x * dt;
+        plane.p1.x += plane.velocity.x * dt;
+        plane.p2.x += plane.velocity.x * dt;
+        plane.p3.x += plane.velocity.x * dt;
+        plane.p4.x += plane.velocity.x * dt;
 
-        plane.p1.y += plane.v.y * dt;
-        plane.p2.y += plane.v.y * dt;
-        plane.p3.y += plane.v.y * dt;
-        plane.p4.y += plane.v.y * dt;
+        plane.p1.y += plane.velocity.y * dt;
+        plane.p2.y += plane.velocity.y * dt;
+        plane.p3.y += plane.velocity.y * dt;
+        plane.p4.y += plane.velocity.y * dt;
 
-        plane.p1.z += plane.v.z * dt;
-        plane.p2.z += plane.v.z * dt;
-        plane.p3.z += plane.v.z * dt;
-        plane.p4.z += plane.v.z * dt;
+        plane.p1.z += plane.velocity.z * dt;
+        plane.p2.z += plane.velocity.z * dt;
+        plane.p3.z += plane.velocity.z * dt;
+        plane.p4.z += plane.velocity.z * dt;
     }
     totV = (1 - 2 * std::abs(speed) * dt) * (1 - 2 * std::abs(speed) * dt) * (1 - 2 * std::abs(speed) * dt);
     totalArea = (1 - 2 * std::abs(speed) * dt) * (1 - 2 * std::abs(speed) * dt) * 6; // сжимаем с двух сторон

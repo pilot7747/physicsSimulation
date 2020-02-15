@@ -1,10 +1,3 @@
-//
-//  main.cpp
-//  physics
-//
-//  Created by Никита on 15.04.2018.
-//  Copyright © 2018 Nikita Pavlichenko. All rights reserved.
-//
 #pragma once
 #include <iostream>
 #include <GLUT/GLUT.h>
@@ -66,49 +59,49 @@ void InitializeObjects(size_t size) {
     left.p3 = point(-0.5, 0, 0.5);
     left.p4 = point(-0.5, 1.2, 0.5);
     left.type = borderType::vertical;
-    
+
     border right; //Правая
     right.p1 = point(0.5, 0, -0.5);
     right.p2 = point(0.5, 1.2, -0.5);
     right.p3 = point(0.5, 0, 0.5);
     right.p4 = point(0.5, 1.2, 0.5);
     right.type = borderType::vertical;
-    
+
     border up; //Верхняя
     up.p1 = point(-0.5, 0, 0.5);
     up.p2 = point(0.5, 1.2, 0.5);
     up.p3 = point(-0.5, 0, 0.5);
     up.p4 = point(0.5, 1.2, 0.5);
     up.type = borderType::horizontal;
-    
+
     border down; //Нижняя
     down.p1 = point(-0.5, 0, -0.5);
     down.p2 = point(0.5, 1.2, -0.5);
     down.p3 = point(-0.5, 0, -0.5);
     down.p4 = point(0.5, 1.2, -0.5);
     down.type = borderType::horizontal;
-    
+
     border background; //Задняя
     background.p1 = point(-0.5, 0, -0.5);
     background.p2 = point(-0.5, 0, 0.5);
     background.p3 = point(0.5, 0, 0.5);
     background.p4 = point(0.5, 0, -0.5);
     background.type = borderType::ortogonal;
-    
+
     border front; //Передняя
     front.p1 = point(-0.5, 1.2, -0.5);
     front.p2 = point(-0.5, 1.2, 0.5);
     front.p3 = point(0.5, 1.2, 0.5);
     front.p4 = point(0.5, 1.2, -0.5);
     front.type = borderType::ortogonal;
-    
+
     planes.push_back(left);
     planes.push_back(right);
     planes.push_back(up);
     planes.push_back(down);
     planes.push_back(background);
     planes.push_back(front);
-    
+
     //Генерим молекулы
     for (int i = 0; i < size; ++i) {
         atom a;
@@ -130,6 +123,7 @@ void InitializeObjects(size_t size) {
         atoms.push_back(a);
     }
 }
+
 //Стартуем
 void startThread() {
     engine.startEngine();

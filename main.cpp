@@ -1,30 +1,16 @@
-//
-//  main.cpp
-//  physics
-//
-//  Created by Никита on 15.04.2018.
-//  Copyright © 2018 Nikita Pavlichenko. All rights reserved.
-//
-#pragma once
 #include <iostream>
-
-//#include <GLUT/GLUT.h>
-//#include <OpenGL/OpenGL.h>
 
 #include <cmath>
 #include <vector>
 #include <thread>
-#include <sstream>
 #include <random>
 #include "atom.h"
 #include "borders.h"
 #include "engine.h"
-//#include <omp.h>
+
 
 constexpr int windowSize = 800;
 unsigned long long maximumSpeed = 890;
-
-//window _window(windowSize, windowSize);
 
 constexpr int maxX = windowSize - 200;
 constexpr int maxY = windowSize - 200;
@@ -45,16 +31,16 @@ void setVexel(double size, double speed = 0, bool piston = false) {
     left.p4 = point(-size, size, size);
     left.type = borderType::vertical;
     if (!piston)
-        left.v.x = speed;
-    
+        left.velocity.x = speed;
+
     border right; //Правая
     right.p1 = point(size, -size, -size);
     right.p2 = point(size, size, -size);
     right.p3 = point(size, -size, size);
     right.p4 = point(size, size, size);
     right.type = borderType::vertical;
-    right.v.x = -speed;
-    
+    right.velocity.x = -speed;
+
     border up; //Верхняя
     up.p1 = point(-size, -size, size);
     up.p2 = point(size, size, size);
@@ -62,8 +48,8 @@ void setVexel(double size, double speed = 0, bool piston = false) {
     up.p4 = point(size, size, size);
     up.type = borderType::horizontal;
     if (!piston)
-        up.v.z = -speed;
-    
+        up.velocity.z = -speed;
+
     border down; //Нижняя
     down.p1 = point(-size, -size, -size);
     down.p2 = point(size, size, -size);
@@ -71,8 +57,8 @@ void setVexel(double size, double speed = 0, bool piston = false) {
     down.p4 = point(size, size, -size);
     down.type = borderType::horizontal;
     if (!piston)
-        down.v.z = speed;
-    
+        down.velocity.z = speed;
+
     border background; //Задняя
     background.p1 = point(-size, -size, -size);
     background.p2 = point(-size, -size, size);
@@ -80,8 +66,8 @@ void setVexel(double size, double speed = 0, bool piston = false) {
     background.p4 = point(size, -size, -size);
     background.type = borderType::ortogonal;
     if (!piston)
-        background.v.y = speed;
-    
+        background.velocity.y = speed;
+
     border front; //Передняя
     front.p1 = point(-size, size, -size);
     front.p2 = point(-size, size, size);
@@ -89,15 +75,15 @@ void setVexel(double size, double speed = 0, bool piston = false) {
     front.p4 = point(size, size, -size);
     front.type = borderType::ortogonal;
     if (!piston)
-        front.v.y = -speed;
-    
+        front.velocity.y = -speed;
+
     planes.push_back(left);
     planes.push_back(right);
     planes.push_back(up);
     planes.push_back(down);
     planes.push_back(background);
     planes.push_back(front);
-    
+
     size *= 2;
     totalArea = size * size * 6;
 }
@@ -118,14 +104,14 @@ vec SphereUniform() {
 
 //Генерируем объекты
 void InitializeObjects(size_t size, const std::string& mode = "constant", bool gravity=false) {
-    
+
     double vexel_size = 1; // Cорона куба
     setVexel(vexel_size);
-    
+
     std::default_random_engine generator;
     std::uniform_real_distribution<double> distribution(-vexel_size + 0.001, vexel_size - 0.001);
     std::uniform_real_distribution<double> angle_distribution;
-    
+
     //Генерим молекулы
     for (int i = 0; i < size; ++i) {
         atom a;

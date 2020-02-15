@@ -1,20 +1,9 @@
-//
-//  atom.h
-//  physics
-//
-//  Created by Никита on 15.04.2018.
-//  Copyright © 2018 Nikita Pavlichenko. All rights reserved.
-//
-
 #ifndef atom_h
 #define atom_h
 #pragma once
-//#include <GLUT/GLUT.h>
-//#include <OpenGL/OpenGL.h>
 
 constexpr long double dt = 0.01; //Время dt в секундак
-constexpr int dt_int = dt * 1000; //Время dt в милисекундах
-long double totV = 1;
+
 long double totalArea = 1 * 6; //Площадь поверхности сосуда
 constexpr long double massOfmolecule = 0.0000000000000000000000000482; //Масса молекулы
 constexpr long double k = 0.0000000000000000000000138065; //Постоянная Больцмана
@@ -25,7 +14,7 @@ struct vec { //Вектор
     d_8 x = 0, y = 0, z = 0;
     vec() : x(0), y(0), z(0) {}
     explicit vec(d_8 _x, d_8 _y, d_8 _z) : x(_x), y(_y), z(_z) {}
-    
+
     //Прегруженные операторы сложения и вычитания для векторов
     vec& operator-=(const vec& v) {
         x -= v.x;
@@ -53,7 +42,7 @@ struct vec { //Вектор
         tmp.z -= v.z;
         return tmp;
     }
-    
+
     vec operator/(const d_8& d) const {
         vec tmp = *this;
         tmp.x /= d;
@@ -61,18 +50,18 @@ struct vec { //Вектор
         tmp.z /= d;
         return tmp;
     }
-    
+
     d_8 operator*(const vec& v) const { // Скалярное произведение векторов
         return x * v.x + y * v.y + z * v.z;
     }
-    
+
     vec& operator*=(const d_8& a) { // Умножение вектора на число
         x *= a;
         y *= a;
         z *= a;
         return *this;
     }
-    
+
     bool equal(const vec& v) const { // Приблизительная проверка равенства векторов
         vec tmp = *this - v;
         if (tmp * tmp < 0.02) {
@@ -118,11 +107,11 @@ Point point(d_8 x, d_8 y, d_8 z) { //Создать точку по трем к�
 
 class atom { //Молекула
 private:
-    
+
 public:
     Point point, prevPoint; //Текущая и предыдущая точки
     vec v, a; //Вектор скорости и ускорения
-    
+
     //Функции для получения проекций
     d_8 x() const;
     d_8 y() const;
@@ -152,7 +141,7 @@ public:
 struct Segment { //Отрезок
     d_8 x1, y1, z1;
     d_8 x2, y2, z2;
-    
+
     Segment(const atom &a) { //Конструктор от текцщего и предыдущего положения молекулы
         x1 = a.prevPoint.x;
         y1 = a.prevPoint.y;

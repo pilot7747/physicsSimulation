@@ -1,11 +1,3 @@
-//
-//  display.h
-//  physics
-//
-//  Created by Никита on 16.04.2018.
-//  Copyright © 2018 Nikita Pavlichenko. All rights reserved.
-//
-
 #ifndef display_h
 #define display_h
 #pragma once
@@ -83,7 +75,7 @@ void Render::draw() { //Рисовать все, что нужно
     outs << pressure;
     pres += outs.str();
     printtext(10, 10, pres);
-    
+
     glutSwapBuffers(); //Обновляем буффер
     glutPostRedisplay();
 }

@@ -1,11 +1,3 @@
-//
-//  atom.h
-//  physics
-//
-//  Created by Никита on 15.04.2018.
-//  Copyright © 2018 Nikita Pavlichenko. All rights reserved.
-//
-
 #ifndef atom_h
 #define atom_h
 #pragma once
@@ -42,11 +34,11 @@ Point point(d_8 x, d_8 y, d_8 z) { //Создать точку по трем к�
 
 class atom { //Молекула
 private:
-    
+
 public:
     Point point, prevPoint; //Текущая и предыдущая точки
     vec v, a; //Вектор скорости и ускорения
-    
+
     //Функции для получения проекций
     d_8 x() const;
     d_8 y() const;
@@ -57,14 +49,14 @@ public:
     d_8 a_x() const;
     d_8 a_y() const;
     d_8 a_z() const;
-    
+
     void setCoor(const Point &p); //Установить новые координаты
 };
 
 struct Segment { //Отрезок
     d_8 x1, y1, z1;
     d_8 x2, y2, z2;
-    
+
     Segment(const atom &a) { //Конструктор от текцщего и предыдущего положения молекулы
         x1 = a.prevPoint.x;
         y1 = a.prevPoint.y;

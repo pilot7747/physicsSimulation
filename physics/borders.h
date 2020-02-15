@@ -1,11 +1,3 @@
-//
-//  borders.h
-//  physics
-//
-//  Created by Никита on 16.04.2018.
-//  Copyright © 2018 Nikita Pavlichenko. All rights reserved.
-//
-
 #ifndef borders_h
 #define borders_h
 #include "atom.h"
